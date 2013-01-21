@@ -1,0 +1,7 @@
+#summary Baical project help
+
+
+ * [http://code.google.com/p/baical/wiki/Introduction Introduction]
+ * [http://code.google.com/p/baical/wiki/Baical Baical] 
+ * [http://code.google.com/p/baical/wiki/Angara Angara] 
+ * [http://code.google.com/p/baical/wiki/P7Trace P7.Trace]

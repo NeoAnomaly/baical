@@ -1,0 +1,5 @@
+#summary Download page
+
+ * [http://baical.googlecode.com/files/Baical_v0.4.zip Baical v0.4]
+ * [http://baical.googlecode.com/files/Angara_v0.9.7.zip Angara v0.9.7] 
+ * [http://code.google.com/p/baical/source/checkout P7 library] 
