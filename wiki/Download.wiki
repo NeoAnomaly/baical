@@ -4,7 +4,7 @@
 Changes list:
  * P7.Telemetry viewer: New renderer, processor, new functionality, error fixes
  * P7.Telemetry storage: Error fixes
- * P7.Trace: enhance scrolling
+ * P7.Trace viewer: enhance scrolling
  * Auto-check for updates
  * P7.Server: optimization
 
