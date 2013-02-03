@@ -1,3 +1,6 @@
+<table border="0" style="margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;" width="100%" cellspacing="0" cellpadding="2">
+<tr>
+<td width="70%"> 
 = Baical =
 I'm working in [http://news.vitecmm.com/ company] which produce own hardware, drivers, SDK, end user software. 
 And I know very well how some times is difficult to catch a random error, which is reproduced rarely on 1 system out of 20 on test bench.
@@ -83,4 +86,13 @@ I hope it will make your life more pleasant and help you to produce a more stabl
             <a href='http://baical.googlecode.com/svn/wiki/Images/P7Telemetry_Menu.png' target='_blank'><img src='http://baical.googlecode.com/svn/wiki/Images/P7Telemetry_Menu.png' width='250' alt='' /></a>
          </td>
      </tr>
+</table>
+</td>
+
+<td width="20%" valign="top" align="right">
+===News:===
+*2013.02.03* Baical, Angara, SDK were [http://code.google.com/p/baical/wiki/Download released]<br/>
+*2012.11.18* Baical was [http://code.google.com/p/baical/wiki/Download released]<br/>
+</td>
+</tr>
 </table>
