@@ -120,7 +120,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////
     //Add_Ref - increase object's reference count
     //
-    //Output:
+    //Return:
     // tINT32 - new reference count value
     virtual tINT32 Add_Ref()                                                = 0;
 
@@ -128,7 +128,7 @@ public:
     //Release - decrease object's reference count. If reference count less or
     //          equal to 0 - object will be destroyed
     //
-    //Output:
+    //Return:
     // tINT32 - new reference count value
     virtual tINT32 Release()                                                = 0;
 
@@ -140,6 +140,17 @@ public:
     //                enum eP7Trace_Level
     virtual void Set_Verbosity(eP7Trace_Level i_eVerbosity)                 = 0;
 
+
+    ////////////////////////////////////////////////////////////////////////////
+    //Share  - function to share current P7.Trace object in address space of the
+    //         current process, to get shared instance use function
+    //         P7_Get_Shared_Trace(tXCHAR *i_pName)
+    //Input:
+    // i_pName - name of the shared object, should be unique for process.
+    //Return:
+    // tBOOL - TRUE on success, FALSE - otherwise (system error or object with
+    //         such name (i_pName) is already exists
+    virtual tBOOL Share(const tXCHAR *i_pName)                              = 0;
 
     ////////////////////////////////////////////////////////////////////////////
     //Trace - send trace message to Baical server.
@@ -170,7 +181,7 @@ public:
     //               N.B.: DO  NOT USE VARIABLE for format  string!  You  should
     //                     always use constant text like L"My Format %d, %s"
     // ...         - arguments variable list
-    //Output:
+    //Return:
     // tBOOL       - Function return only 2 possible values:
     //              - TRUE  - if trace has been posted in delivery queue
     //              - FALSE - can be returned by the next reasons (in descending 
@@ -241,17 +252,15 @@ extern IP7_Trace * __stdcall P7_Create_Trace(IP7_Client   *i_pClient,
                                             );
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
-//This functions allow you to get trace/client instance if it was created by 
+//This functions allow you to get P7 trace instance if it was created by 
 //someone other inside current process. If no instance was registered inside
 //current process - function will return NULL. Do not forget to call Release
-//on IP7_Trace/IP7_Client when you finish your work
+//on interface when you finish your work
 //N.B.: Call of this functions can be slow, do not call this functions often, 
-//      the best choice is to call it once per module (DLL, LIB, ...) and then
+//      the best choice is to call it once per module (DLL, LIB, SO ..) and then
 //      redistribute pointer inside module by other way
-//extern IP7_Trace  * __stdcall P7_Get_Trace();
-//extern IP7_Client * __stdcall P7_Get_Client();
-
+//      !!!!!! Function is not implemented for Linux and will always return NULL
+extern IP7_Trace  * __stdcall P7_Get_Shared_Trace(const tXCHAR *i_pName);
 
 #endif //P7_TRACE_H_AZH

@@ -48,6 +48,7 @@
 #include "CRC32.h"
 #include "RBTree.h"
 #include "AList.h"
+#include "PShared.h"
 
 #include "PWString.h"
 #include "PFileSystem.h"

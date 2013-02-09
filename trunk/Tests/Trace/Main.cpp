@@ -83,9 +83,12 @@
 //                                   TEST 1                                   //
 ////////////////////////////////////////////////////////////////////////////////
 // Here we made simple test Create and destroy P7 client and P7 trace         //
+// and using shared objects for P7 client & trace                             //
 ////////////////////////////////////////////////////////////////////////////////
 
 #define TEST_01_COUNT                                                  "/Count="
+#define TEST_01_P7_TRACE_SHARE_NAME                         TM("P7.Trace.Share")
+#define TEST_01_P7_CLIENT_SHARE_NAME                              TM("P7.Share")
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -93,7 +96,9 @@
 int Test_01(int i_iArgC, char* i_pArgV[])
 {
     IP7_Client *l_pClient  = NULL;
+    IP7_Client *l_pClientS = NULL;
     IP7_Trace  *l_pTrace   = NULL;
+    IP7_Trace  *l_pTraceS  = NULL;
     tUINT32     l_dwCount  = 1000;
     tXCHAR      l_pChannel[128];
     tBOOL       l_bError   = FALSE;
@@ -123,7 +128,7 @@ int Test_01(int i_iArgC, char* i_pArgV[])
     
     for (tUINT32 l_dwI = 0; l_dwI < l_dwCount; l_dwI++)
     {
-       printf("Iteration = %d\n", l_dwI);
+        printf("Iteration = %d\n", l_dwI);
 
         l_pClient = P7_Create_Client(NULL);
 
@@ -134,6 +139,20 @@ int Test_01(int i_iArgC, char* i_pArgV[])
         }
         else
         {
+            l_pClient->Share(TEST_01_P7_CLIENT_SHARE_NAME);
+            l_pClientS = P7_Get_Shared(TEST_01_P7_CLIENT_SHARE_NAME);
+
+            if (l_pClientS)
+            {
+                l_pClientS->Release();
+                l_pClientS = NULL;
+            }
+            else
+            {
+                printf("Error: P7_Get_Shared failed. Iteration = %d\n", l_dwI);
+            }
+
+
             for (tUINT32 l_dwJ = 0; l_dwJ < 2; l_dwJ++)
             {
                 SPRINTF(l_pChannel, TM("Chanel[%03d - %02d]"), l_dwI, l_dwJ);
@@ -141,9 +160,24 @@ int Test_01(int i_iArgC, char* i_pArgV[])
 
                 if (l_pTrace)
                 {
-                    for (tUINT32 l_dwJ = 0; l_dwJ < 5000; l_dwJ ++)
+                    for (tUINT32 l_dwJ = 0; l_dwJ < 2000; l_dwJ ++)
                     {
                         l_pTrace->P7_INFO(0, TM("Iteration %d"), l_dwJ);
+                    }
+
+                    //will not work under Linux
+                    if (l_pTrace->Share(TEST_01_P7_TRACE_SHARE_NAME))
+                    {
+                        l_pTraceS = P7_Get_Shared_Trace(TEST_01_P7_TRACE_SHARE_NAME);
+                        if (l_pTraceS)
+                        {
+                            for (tUINT32 l_dwJ = 0; l_dwJ < 2000; l_dwJ ++)
+                            {
+                                l_pTrace->P7_INFO(0, TM("Share: Iteration %d"), l_dwJ);
+                            }
+
+                            l_pTraceS->Release();
+                        }
                     }
 
                     l_pTrace->Release();

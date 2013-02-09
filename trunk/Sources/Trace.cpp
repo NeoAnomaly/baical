@@ -50,162 +50,31 @@ IP7_Trace * __stdcall P7_Create_Trace(IP7_Client   *i_pClient,
 }//P7_Create_Client
 
 
-//////////////////////////////////////////////////////////////////////////////////
-////P7_Get_Trace
-//IP7_Trace  * __stdcall P7_Get_Trace()
-//{
-//    IP7_Trace *l_pTrace = NULL;
-//    if (P7_Get_Map_Instance(NULL, &l_pTrace))
-//    {
-//        if (l_pTrace)
-//        {
-//            l_pTrace->Add_Ref();
-//        }
-//    }
-//    else 
-//    {
-//        l_pTrace = NULL;
-//    }
-//
-//    return l_pTrace;
-//}//P7_Get_Trace
-//
-//
-//////////////////////////////////////////////////////////////////////////////////
-////P7_Get_Client
-//IP7_Client * __stdcall P7_Get_Client()
-//{
-//    IP7_Client *l_pClient = NULL;
-//    if (P7_Get_Map_Instance(&l_pClient, NULL))
-//    {
-//        if (l_pClient)
-//        {
-//            l_pClient->Add_Ref();
-//        }
-//    }
-//    else 
-//    {
-//        l_pClient = NULL;
-//    }
-//
-//    return l_pClient;
-//}//P7_Get_Client
-//
-//
-//
-//////////////////////////////////////////////////////////////////////////////////
-////P7_Get_Map_Name
-//void P7_Get_Map_Name(wchar_t *o_pBuffer, tUINT32 i_dwLength)
-//{
-//    FILETIME   l_tProcess_Time = {0};
-//    FILETIME   l_tStub_01      = {0};
-//    FILETIME   l_tStub_02      = {0};
-//    FILETIME   l_tStub_03      = {0};
-//    SYSTEMTIME l_sTime         = {0};
-//
-//    GetProcessTimes(GetCurrentProcess(),
-//                    &l_tProcess_Time,
-//                    &l_tStub_01,
-//                    &l_tStub_02,
-//                    &l_tStub_03
-//                   );
-//
-//    FileTimeToSystemTime(&l_tProcess_Time, &l_sTime);
-//
-//    swprintf_s(o_pBuffer, 
-//               i_dwLength, 
-//               TM("%s 0x%X %02d.%02d.%04d %02d:%02d:%02d:%03d"),
-//               P7TRACE_MAP_FILE_NAME, 
-//               GetCurrentProcessId(),
-//               l_sTime.wDay,
-//               l_sTime.wMonth,
-//               l_sTime.wYear,
-//               l_sTime.wHour,
-//               l_sTime.wMinute,
-//               l_sTime.wSecond,
-//               l_sTime.wMilliseconds
-//              );
-//}
-//
-//
-//////////////////////////////////////////////////////////////////////////////////
-////P7_Get_Map_Instance
-//tBOOL P7_Get_Map_Instance(IP7_Client **o_pClient, IP7_Trace **o_pTrace)
-//{
-//    HANDLE  l_hMapFile = NULL;
-//    tUINT8   *l_pBuffer  = NULL;
-//    tBOOL   l_bResult  = TRUE;
-//    wchar_t l_pName[LENGTH(P7TRACE_MAP_FILE_NAME) + 128];
-//
-//    P7_Get_Map_Name(l_pName, LENGTH(l_pName));
-//
-//    l_hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS,  // read/write access
-//                                 FALSE,                // do not inherit the name
-//                                 l_pName               // name of mapping object
-//                                );           
-//
-//    if (l_hMapFile == NULL)
-//    {
-//       l_bResult = FALSE;
-//    }
-//
-//    if (l_bResult)
-//    {
-//        l_pBuffer = (tUINT8*) MapViewOfFile(l_hMapFile,      
-//                                          FILE_MAP_READ, 
-//                                          0,
-//                                          0,
-//                                          P7TRACE_MAP_FILE_SIZE
-//                                         );
-//
-//        if (l_pBuffer == NULL)
-//        {
-//           l_bResult = FALSE;
-//        }
-//    }
-//
-//    if (l_bResult)
-//    {
-//        __try
-//        {
-//            tUINT8 *l_pIter = l_pBuffer;
-//            if (o_pTrace)
-//            {
-//                *o_pTrace = *(CP7Trace**)l_pIter;
-//            }
-//
-//            l_pIter += sizeof(CP7Trace*);
-//            if (o_pClient)
-//            {
-//                *o_pClient = *(IP7_Client**)(l_pIter);
-//            }
-//        }
-//
-//        __except (   GetExceptionCode() == EXCEPTION_IN_PAGE_ERROR 
-//                   ? EXCEPTION_EXECUTE_HANDLER 
-//                   : EXCEPTION_CONTINUE_SEARCH
-//                 )
-//        {
-//            l_bResult = FALSE;
-//        }
-//    }
-//
-//    if (l_pBuffer)
-//    {
-//        UnmapViewOfFile(l_pBuffer);
-//        l_pBuffer = NULL;
-//    }
-//
-//    if (l_hMapFile)
-//    {
-//        CloseHandle(l_hMapFile);
-//        l_hMapFile = NULL;
-//    }
-//
-//    return l_bResult;
-//}//P7_Get_Map_Instance
+////////////////////////////////////////////////////////////////////////////////
+//P7_Get_Shared_Trace
+IP7_Trace * __stdcall P7_Get_Shared_Trace(const tXCHAR *i_pName)
+{
+    IP7_Trace *l_pReturn = NULL;
+
+    if (Shared_Read(i_pName, (tUINT8*)&l_pReturn, sizeof(IP7_Trace*)))
+    {
+        if (l_pReturn)
+        {
+            l_pReturn->Add_Ref();
+        }
+    }
+    else
+    {
+        l_pReturn = NULL;
+    }
+
+   return l_pReturn;
+}//P7_Get_Shared_Trace
 
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 enum ePrefix_Type
 {
     EPREFIX_TYPE_I64   = 0,
@@ -832,7 +701,7 @@ CP7Trace::CP7Trace(IP7_Client *i_pClient, const tXCHAR *i_pName)
     , m_dwChunks_Max_Count(0)
     , m_wDesc_Tree_ID(P7_TRACE_DESC_HARDCODED_COUNT)
     , m_bIs_Channel(FALSE)
-    //, m_hMapFile(NULL)
+    , m_pShared(NULL)
 {
      memset(&m_sCS, 0, sizeof(m_sCS));
     
@@ -887,11 +756,6 @@ CP7Trace::CP7Trace(IP7_Client *i_pClient, const tXCHAR *i_pName)
          m_bIs_Channel  = (ECLIENT_STATUS_OK == m_pClient->Register_Channel(this));
          m_bInitialized = m_bIs_Channel;
      }
-
-     if (m_bInitialized)
-     {
-         Register_Shared();
-     }
 }
 
 
@@ -899,6 +763,12 @@ CP7Trace::CP7Trace(IP7_Client *i_pClient, const tXCHAR *i_pName)
 // ~CP7Trace                                       
 CP7Trace::~CP7Trace()
 {
+    if (m_pShared)
+    {
+        Shared_Close(m_pShared);
+        m_pShared = NULL;
+    }
+
     if (m_bIs_Channel)
     {
         //inform server about channel closing, I didn't check status, just
@@ -938,12 +808,6 @@ CP7Trace::~CP7Trace()
         delete [] m_pChunks;
         m_pChunks = NULL;
     }
-
-//    if (m_hMapFile)
-//    {
-//        CloseHandle(m_hMapFile);
-//        m_hMapFile = NULL;
-//    }
 
     LOCK_DESTROY(m_sCS);
 }// ~CP7Trace                                      
@@ -1025,11 +889,28 @@ tBOOL CP7Trace::Trace(tUINT16       i_wTrace_ID,
                      (tKeyType*)&i_pFunction,
                      &i_pFormat
                     );
-}
+}// Trace                                      
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// eTrace                                      
+// Share                                      
+tBOOL CP7Trace::Share(const tXCHAR *i_pName)
+{
+    if (NULL != m_pShared)
+    {
+        return FALSE;
+    }
+
+    void *l_pTrace = static_cast<IP7_Trace*>(this);
+
+    m_pShared = Shared_Create(i_pName, (tUINT8*)&l_pTrace, sizeof(l_pTrace));
+
+    return (NULL != m_pShared);
+}// Share
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Trace_Embedded                                      
 tBOOL CP7Trace::Trace_Embedded(tUINT16       i_wTrace_ID,   
                               eP7Trace_Level i_eLevel, 
                               tUINT16        i_wModule_ID,
@@ -1051,7 +932,7 @@ tBOOL CP7Trace::Trace_Embedded(tUINT16       i_wTrace_ID,
                      i_ppFormat
                     );
 
-}
+}// Trace_Embedded
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1282,87 +1163,3 @@ __forceinline tBOOL CP7Trace::Inc_Chunks(tUINT32 i_dwInc)
 
     return TRUE;
 }// Inc_Chunks
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Register_Shared
-tBOOL CP7Trace::Register_Shared()
-{
-    tBOOL     l_bReturn  = TRUE;
-//    tUINT8    *l_pBuffer  = NULL;
-//    wchar_t  l_pName[LENGTH(P7TRACE_MAP_FILE_NAME) + 128];
-//
-//    P7_Get_Map_Name(l_pName, LENGTH(l_pName));
-//
-//    m_hMapFile = CreateFileMappingW(INVALID_HANDLE_VALUE, // use paging file
-//                                    NULL,                 // default security
-//                                    PAGE_READWRITE,       // read/write access
-//                                    0,                    // maximum object size (high-order tUINT32)
-//                                    P7TRACE_MAP_FILE_SIZE,// maximum object size (low-order tUINT32)
-//                                    l_pName               // name of mapping object
-//                                   );     
-//
-//    if (NULL == m_hMapFile)
-//    {
-//        printf("Could not create P7 file mapping object (%d).\n",  GetLastError());
-//        l_bReturn = FALSE;
-//    }
-//    else if (ERROR_ALREADY_EXISTS == GetLastError())
-//    {
-//        printf("P7 mapping object already exist.\n",  GetLastError());
-//        l_bReturn = FALSE;
-//    }
-//
-//    if (l_bReturn)
-//    {
-//        l_pBuffer = (tUINT8*)MapViewOfFile(m_hMapFile,    
-//                                         FILE_MAP_ALL_ACCESS,
-//                                         0,
-//                                         0,
-//                                         P7TRACE_MAP_FILE_SIZE
-//                                       );
-// 
-//        if (NULL == l_pBuffer)
-//        {
-//            printf("Could not map view of file (%d).\n", GetLastError());
-//            l_bReturn = FALSE;
-//        }
-//    }
-//
-//    if (l_bReturn)
-//    {
-//        __try
-//        {
-//            tUINT8 *l_pIter = l_pBuffer;
-//            *(CP7Trace**)l_pIter = this;
-//
-//            l_pIter += sizeof(CP7Trace*);
-//            *(IP7_Client**)(l_pIter) = m_pClient;
-//        }
-//
-//        __except (   GetExceptionCode() == EXCEPTION_IN_PAGE_ERROR 
-//                   ? EXCEPTION_EXECUTE_HANDLER 
-//                   : EXCEPTION_CONTINUE_SEARCH
-//                 )
-//        {
-//            printf("Get exception, error (%d).\n", GetLastError());
-//            l_bReturn = FALSE;
-//        }
-//    }
-//
-//    if (l_pBuffer)
-//    {
-//        UnmapViewOfFile(l_pBuffer);
-//        l_pBuffer = NULL;
-//    }
-//
-//    if (    (FALSE == l_bReturn)
-//         && (m_hMapFile)
-//       )
-//    {
-//        CloseHandle(m_hMapFile);
-//        m_hMapFile = NULL;
-//    }
-
-    return l_bReturn;
-}

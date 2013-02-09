@@ -79,6 +79,9 @@ class CP7Telemetry:
     tBOOL                   m_bIs_Channel;
 
     tUINT32                 m_dwLast_ID;
+
+    hShared                *m_pShared;
+
 public:
     CP7Telemetry(IP7_Client *i_pClient, const tXCHAR *i_pName); 
     ~CP7Telemetry();
@@ -99,6 +102,8 @@ public:
     virtual tBOOL  Find(const tXCHAR *i_pName, tUINT8 *o_pID);
 
     virtual tBOOL  Add(tUINT8 i_bID, tINT64 i_llValue);
+
+    virtual tBOOL  Share(const tXCHAR *i_pName);
 
     virtual tINT32 Add_Ref()
     {

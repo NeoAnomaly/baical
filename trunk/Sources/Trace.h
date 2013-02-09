@@ -142,7 +142,7 @@ class CP7Trace:
 
     tBOOL                   m_bIs_Channel;
 
-    //HANDLE                  m_hMapFile;
+    hShared                *m_pShared;
 public:
     CP7Trace(IP7_Client *i_pClient, const tXCHAR *i_pName); //for arguments description see P7_Client.h
     ~CP7Trace();
@@ -189,6 +189,8 @@ public:
         return l_lResult;
     }
 
+    tBOOL Share(const tXCHAR *i_pName);
+
 private:
     tBOOL   Trace_Raw(tUINT16        i_wTrace_ID,   
                       eP7Trace_Level i_eLevel, 
@@ -201,8 +203,6 @@ private:
                   );
 
     tBOOL   Inc_Chunks(tUINT32 i_dwInc);
-
-    tBOOL   Register_Shared();
 };
 
 #endif //TRACE_H_AZH

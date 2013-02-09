@@ -180,7 +180,19 @@ public:
     virtual eClient_Status Sent(tUINT32          i_dwChannel_ID,
                                 sP7C_Data_Chunk *i_pChunks, 
                                 tUINT32          i_dwCount,
-                                tUINT32          i_dwSize)                = 0;
+                                tUINT32          i_dwSize)                  = 0;
+
+    ////////////////////////////////////////////////////////////////////////////
+    //Share  - function to share current P7 object in address space of
+    //         the current process, to get shared instance use function
+    //         P7_Get_Shared(tXCHAR *i_pName)
+    //Input:
+    // i_pName - name of the shared object, should be unique for process.
+    //Return:
+    // tBOOL - TRUE on success, FALSE - otherwise (system error or object with
+    //         such name (i_pName) is already exists
+    virtual tBOOL Share(const tXCHAR *i_pName)                              = 0;
+
 
 };
 
@@ -190,5 +202,18 @@ public:
 //If you do not specify arguments - the function will try to analyze process 
 //arguments
 extern IP7_Client * __stdcall P7_Create_Client(tXCHAR *i_pArgs);
+
+
+////////////////////////////////////////////////////////////////////////////////
+//This functions allow you to get P7 instance if it was created by 
+//someone other inside current process. If no instance was registered inside
+//current process - function will return NULL. Do not forget to call Release
+//on interface when you finish your work
+//N.B.: Call of this functions can be slow, do not call this functions often, 
+//      the best choice is to call it once per module (DLL, LIB, SO ..) and then
+//      redistribute pointer inside module by other way
+//      !!!!!! Function is not implemented for Linux and will always return NULL
+extern IP7_Client  * __stdcall P7_Get_Shared(const tXCHAR *i_pName);
+
 
 #endif //P7_CLIENT_H_AZH
