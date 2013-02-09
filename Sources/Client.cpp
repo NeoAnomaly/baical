@@ -42,6 +42,33 @@ IP7_Client * __stdcall P7_Create_Client(tXCHAR *i_pArgs)
 
 
 ////////////////////////////////////////////////////////////////////////////////
+//P7_Get_Shared
+IP7_Client * __stdcall P7_Get_Shared(const tXCHAR *i_pName)
+{
+    IP7_Client *l_pReturn = NULL;
+
+    if (Shared_Read(i_pName, (tUINT8*)&l_pReturn, sizeof(IP7_Client*)))
+    {
+        if (l_pReturn)
+        {
+            l_pReturn->Add_Ref();
+        }
+    }
+    else
+    {
+        l_pReturn = NULL;
+    }
+
+   return l_pReturn;
+}//P7_Get_Shared
+
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////
 //CClient
 CClient::CClient(tXCHAR *i_pArgs)
     : m_bIs_Winsock(FALSE)
@@ -81,6 +108,8 @@ CClient::CClient(tXCHAR *i_pArgs)
     , m_hComm_Thread(0) //NULL
     , m_bChnl_Thread(FALSE)
     , m_hChnl_Thread(0) //NULL
+
+    , m_pShared(NULL)
 {
     memset(m_pChannels, 0, sizeof(IP7C_Channel*)*USER_PACKET_CHANNEL_ID_MAX_SIZE);
 
@@ -144,6 +173,12 @@ CClient::CClient(tXCHAR *i_pArgs)
 //~CClient
 CClient::~CClient()
 {
+    if (m_pShared)
+    {
+        Shared_Close(m_pShared);
+        m_pShared = NULL;
+    }
+
     m_cComm_Event.Set(THREAD_EXIT_SIGNAL);
     m_cChnl_Event.Set(THREAD_EXIT_SIGNAL);
 
@@ -1496,6 +1531,23 @@ tBOOL CClient::Get_Info(sP7C_Info *o_pInfo)
 
     return TRUE;
 }//Get_Info
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Share                                      
+tBOOL CClient::Share(const tXCHAR *i_pName)
+{
+    if (NULL != m_pShared)
+    {
+        return FALSE;
+    }
+
+    void *l_pPointer = static_cast<IP7_Client*>(this);
+
+    m_pShared = Shared_Create(i_pName, (tUINT8*)&l_pPointer, sizeof(l_pPointer));
+
+    return (NULL != m_pShared);
+}// Share
 
 
 ////////////////////////////////////////////////////////////////////////////////

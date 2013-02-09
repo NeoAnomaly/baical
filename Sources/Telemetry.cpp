@@ -45,6 +45,32 @@ IP7_Telemetry * __stdcall P7_Create_Telemetry(IP7_Client   *i_pClient,
 }//P7_Create_Telemetry
 
 
+////////////////////////////////////////////////////////////////////////////////
+//P7_Get_Shared_Trace
+IP7_Telemetry * __stdcall P7_Get_Shared_Telemetry(const tXCHAR *i_pName)
+{
+    IP7_Telemetry *l_pReturn = NULL;
+
+    if (Shared_Read(i_pName, (tUINT8*)&l_pReturn, sizeof(IP7_Telemetry*)))
+    {
+        if (l_pReturn)
+        {
+            l_pReturn->Add_Ref();
+        }
+    }
+    else
+    {
+        l_pReturn = NULL;
+    }
+
+   return l_pReturn;
+}//P7_Get_Shared_Trace
+
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // CP7Tel_Counter                                       
@@ -184,6 +210,7 @@ CP7Telemetry::CP7Telemetry(IP7_Client *i_pClient, const tXCHAR *i_pName)
     , m_dwChunks_Max_Count(0)
     , m_bIs_Channel(FALSE)
     , m_dwLast_ID(0)
+    , m_pShared(NULL)
 {
      memset(&m_sCS, 0, sizeof(m_sCS));
     
@@ -246,6 +273,12 @@ CP7Telemetry::CP7Telemetry(IP7_Client *i_pClient, const tXCHAR *i_pName)
 // ~CP7Telemetry                                       
 CP7Telemetry::~CP7Telemetry()
 {
+    if (m_pShared)
+    {
+        Shared_Close(m_pShared);
+        m_pShared = NULL;
+    }
+
     if (m_bIs_Channel)
     {
         //inform server about channel closing, I didn't check status, just
@@ -568,6 +601,23 @@ l_lblExit:
 
     return l_bReturn;
 }// Add  
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Share                                      
+tBOOL CP7Telemetry::Share(const tXCHAR *i_pName)
+{
+    if (NULL != m_pShared)
+    {
+        return FALSE;
+    }
+
+    void *l_pPointer = static_cast<IP7_Telemetry*>(this);
+
+    m_pShared = Shared_Create(i_pName, (tUINT8*)&l_pPointer, sizeof(l_pPointer));
+
+    return (NULL != m_pShared);
+}// Share
 
 
 ////////////////////////////////////////////////////////////////////////////////

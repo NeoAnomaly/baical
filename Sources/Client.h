@@ -95,6 +95,8 @@ class CClient:
     tBOOL                m_bChnl_Thread;
     CThShell::tTHREAD    m_hChnl_Thread;
 
+    hShared             *m_pShared;
+
 public:
     CClient(tXCHAR *i_pArgs);
     ~CClient();
@@ -162,6 +164,8 @@ public:
 
     tBOOL Get_Status(sP7C_Status *o_pStatus);
     tBOOL Get_Info(sP7C_Info *o_pInfo);
+
+    tBOOL Share(const tXCHAR *i_pName);
 
 private:
     static THSHELL_RET_TYPE THSHELL_CALL_TYPE Static_Comm_Routine(void *i_pContext)
