@@ -12,9 +12,7 @@ The library consists of 3 parts:
  * Traces - `IP7_Trace`. Process your trace calls, collect all related information (thread, proc., file, ... etc), pack it and forward to network engine (`IP7_Client`). Interface definition located in {{{[P7]\Headers\P7_Trace.h}}}
  * Telemetry - `IP7_Telemetry`. Process your telemetry calls, pack it and forward to network engine (`IP7_Client`). Interface definition located in {{{[P7]\Headers\P7_Telemetry.h}}}
 
-*N.B.*: All interfaces functions are thread safe.
-
-Basic facts:
+*Basic facts*:
  # Language: C++ 
  # Speed is priority, library designed to suit high load:
       * Intel i7-870, 50 000 traces per second - 0,5% CPU, max ~2.5 millions
