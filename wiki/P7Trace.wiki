@@ -6,26 +6,37 @@
 
 
 =1. About=
-What the library is:
- # C++ library with C++ interfaces
- # It process your variable arguments traces, like:
+
+The library consists of 3 parts:
+ * Network engine - `IP7_Client`. Deliver stream data from source to destination over network. Interface definition located in {{{[P7]\Headers\P7_Client.h}}}
+ * Traces - `IP7_Trace`. Process your trace calls, collect all related information (thread, proc., file, ... etc), pack it and forward to network engine (`IP7_Client`). Interface definition located in {{{[P7]\Headers\P7_Trace.h}}}
+ * Telemetry - `IP7_Telemetry`. Process your telemetry calls, pack it and forward to network engine (`IP7_Client`). Interface definition located in {{{[P7]\Headers\P7_Telemetry.h}}}
+
+*N.B.*: All interfaces functions are thread safe.
+
+Basic facts:
+ # Language: C++ 
+ # Speed is priority, library designed to suit high load:
+      * Intel i7-870, 50 000 traces per second - 0,5% CPU, max ~2.5 millions
+      * Intel E8400 (Core 2 duo), 15 000 traces per second - 0,5% CPU, max ~ 750 000
+      * ARM 926EJ (v5), 1 000 traces per second - 0,5% CPU, max ~20 000
+ # Thread safe 
+ # Process your variable arguments traces, like:
 {{{ 
 P7.Trace("DMA (%d) is complete\n", szCount); 
 P7.Error("DMA (%d) error %s\n", szCount, pError); 
 }}}
- # The library pack your traces and deliver them to [http://code.google.com/p/baical/wiki/Baical server] over network
+ # Process your telemetry samples (buffers usage, CPU consuming, handles count, ... everything what you would like [http://baical.googlecode.com/svn/wiki/Images/P7Telemetry_Algo.png visualize])
+ # The library pack your traces & telemetry and deliver them to [http://code.google.com/p/baical/wiki/Baical server] over network
  # The library use reliable streaming protocol over UDP.
- # The library support UTF-8 and UTF-16 characters
- # If connection with a server is not established or has been lost - all new traces will be dropped. Thus your application will work without additional load.
+ # Trace messages strings: UTF-8 (Linux) UTF-16 (Windows)
+ # If connection with a server is not established or has been lost - all new traces/telemetry samples will be dropped. Thus your application will work without additional load.
  # Verbosity level can be set from server to reduce load
+ # Telemetry counters are managed (on/off) from Baical server
  # The library works for 
    * Windows 32/64 bits (Visual Studio)
    * Linux 32/64 bits (G++)
- # Speed is priority:
-      * ARM 926EJ (v5), 1 000 traces per second - 0,5% CPU, max ~20 000
-      * Intel E8400 (Core 2 duo), 15 000 traces per second - 0,5% CPU, max ~ 750 000
-      * Intel i7-870, 50 000 traces per second - 0,5% CPU, max ~2.5 millions
- # Every trace contains detailed information:
+ # Every trace message contains detailed information:
       * Text message
       * Level (error, warning, .. etc)
       * Time with 100ns granularity
@@ -37,33 +48,23 @@ P7.Error("DMA (%d) error %s\n", szCount, pError);
       * File line number
       * Sequence number
 
-=2. Speed=
-Useless to talk about, let's run tests:
-  * [http://baical.googlecode.com/svn/trunk/Infrastructure/P7/Tests/Speed/ Test 1]: allow to compare different way of information printing (to buffer, to console and to Baical server). Command line arguments (Replace IP 192.168.0.1 by Baical IP):
+=2. Speed test=
+You can run your own speed tests to estimate productivity of your hardware, to do that you need:
+  * [http://code.google.com/p/baical/wiki/Download Download] latest Baical server, unpack the archive and run `GBaical.exe`;
+  * Setup your firewall - you need to enable UDP port 9009 for Baical server;
+  * [http://code.google.com/p/baical/source/checkout Checkout] latest P7 library source code;
+  * Compile it, how to do it you can read in chapter "compilation"
+  * Run the speed test (located in {{{[P7]\Binaries\}}}), it allows to compare different way of information printing (to buffer, to console and to Baical server). Command line arguments (Replace IP 192.168.0.1 by your Baical IP):
 {{{
 Speed /P7.Addr=192.168.0.1 /P7.PSize=1472 /P7.Pool=8192
-}}}
-  * [https://baical.googlecode.com/svn/trunk/Infrastructure/P7/Tests/Trace Test 2]: application contains few tests but for speed test you can use only test #4, it allow to measure maximum possible speed of P7.Trace engine. Command line arguments (Replace IP 192.168.0.1 by Baical IP):
-{{{
-P7_Test /Test=4 /P7.Addr=192.168.0.1 /P7.PSize=1472 /P7.Pool=8192
 }}}
 
 You can build them in Windows and Linux, build instructions are located at the bottom of the page.
 
-*N.B.*: Do not forget to run Baical server to receive messages and configure your firewall.
+=3.1 P7 Client=
+Interface definition located in {{{[P7]\Headers\P7_Client.h}}}. 
 
-
-
-=3. Components and interfaces=
-The library consists of 2 parts:
- * Network engine. Deliver stream data from source to destination over network. It represented by `IP7_Client` interface described in {{{[Baical]\Infrastructure\P7\Headers\P7_Client.h}}}
- * Trace engine. Process your trace calls, collect all related information (thread, proc., file, ... etc), pack it and forward to network engine. It represented by `IP7_Trace` interface described in {{{[Baical]\Infrastructure\P7\Headers\P7_Extensions.h}}}
-
-*N.B.*: All interfaces functions are thread safe.
-
-
-==3.1 IP7_Client interface==
-===3.1.1 !P7_Create_Client()===
+==3.1 !P7_Create_Client()==
 _Description_: create an instance of IP7_Client interface<br/>
 _Prototype_:
 {{{
@@ -93,8 +94,8 @@ _Arguments_:
 
 _Return_: If function fails it will return NULL. Details will be located inside log file (Windows) or printed to console (Linux).
 
-===3.1.2 !Add_Ref()===
-_Description_: Increase object reference counterm, initial object value is 1<br/>
+==3.2 !Add_Ref()==
+_Description_: Increase object reference counter, initial object value is 1<br/>
 
 _Prototype_:
 {{{
@@ -106,7 +107,7 @@ _Return_: New reference counter value<br/>
 
 
 
-===3.1.3 Release()===
+==3.3 Release()==
 _Description_: Decrease object reference counter, 0 value is equal to self-destruction<br/>
 
 _Prototype_:
@@ -117,7 +118,7 @@ tINT32 IP7_Client::Release();
 _Arguments_: No<br/>
 _Return_: New reference counter value<br/>
 
-===3.1.4 !Get_Status()===
+==3.4 !Get_Status()==
 _Description_: Provide information about connection status<br/>
 
 _Prototype_:
@@ -132,7 +133,7 @@ _Arguments_:
 
 _Return_: TRUE on success, FALSE - otherwise
 
-===3.1.5 !Get_Info()===
+==3.5 !Get_Info()==
 _Description_: Provide information about internal state<br/>
 
 _Prototype_:
@@ -151,7 +152,7 @@ _Arguments_:
 _Return_: TRUE on success, FALSE - otherwise
 
 
-===3.1.6 !Register_Channel()===
+==3.6 !Register_Channel()==
 _Description_: Channel registration. You should register your channel to be able to start working. There are 32 channels max.<br/>
 
 
@@ -221,7 +222,7 @@ _Return_:
   * ECLIENT_STATUS_INTERNAL_ERROR - no more free channels
   
 
-===3.1.7 !Unregister_Channel()===
+==3.7 !Unregister_Channel()==
 _Description_: Unregister previously registered channel<br/>
 
 _Prototype_:
@@ -237,7 +238,7 @@ _Return_:
   * ECLIENT_STATUS_WRONG_PARAMETERS - input parameter is wrong, channel is not used.
 
 
-===3.1.8 Sent()===
+==3.8 Sent()==
 _Description_: Send data to server<br/>
 
 _Prototype_:
@@ -263,9 +264,9 @@ _Return_:
   * ECLIENT_STATUS_WRONG_PARAMETERS - parameters are wrong
 
 
-
-==3.2 IP7_Trace==
-===3.2.1 !P7_Create_Trace===
+=4 P7 Trace interface=
+IP7_Trace
+==4.1 !P7_Create_Trace==
 _Description_: create an instance of IP7_Trace interface. You can create up to 32 IP7_Trace objects per one IP7_Client object<br/>
 _Prototype_:
 {{{
@@ -281,7 +282,7 @@ _Arguments_:
 _Return_: If function fails it will return NULL. Details will be located inside log file (Windows) or printed to console (Linux).
 
 
-===3.2.2 !Add_Ref()===
+==4.2 !Add_Ref()==
 _Description_: Increase object reference counterm, initial object value is 1<br/>
 
 _Prototype_:
@@ -294,7 +295,7 @@ _Return_: New reference counter value<br/>
 
 
 
-===3.2.3 Release()===
+==4.3 Release()==
 _Description_: Decrease object reference counter, 0 value is equal to self-destruction<br/>
 
 _Prototype_:
@@ -325,7 +326,7 @@ _Arguments_:
 
 _Return_: no<br/>
 
-===3.2.5 Trace()===
+==4.5 Trace()==
 _Description_: Post trace message to delivery queue, function is not blocking<br/>
 
 _Prototype_:
@@ -367,7 +368,7 @@ _Return_: Function return only 2 possible values:
 
 
 
-===3.2.6 !Trace_Embedded()===
+==4.6 !Trace_Embedded()==
 _Description_: Function is equal to IP7_Trace::Trace() with one exception: Trace_Embedded() can be used inside another function with variable arguments<br/>
 
 _Prototype_:
@@ -388,9 +389,10 @@ _Arguments_: see IP7_Trace::Trace() description<br/>
 _Return_: see IP7_Trace::Trace() description<br/>
 
 
+=4. P7 Telemetry interface=
+Under construction
 
-
-=4. Example=
+=5. Example=
 The example demonstrates how to:
  * Create P7 client 
  * Create 2 trace channels
@@ -475,7 +477,7 @@ P7_Example /P7.Addr=127.0.0.1
 
 N.B.: Do not forget to setup your firewall, it can block traffic.
 
-=5. Integration=
+=6. Integration=
 Integration process is simple:
  # Build the [http://baical.googlecode.com/svn/Trunk/P7/ library]
  # Include into your project next headers
@@ -489,8 +491,8 @@ Integration process is simple:
     * Windows: _Ws2_32.lib_ and _P7Client_XXX.lib_ libraries where XXX is postfix 32, 32_d, 64, 64_d
     * Linux : _libP7.a_ library
 
-=6. Compilation=
-==6.1. Requirements ==
+=7. Compilation=
+==7.1. Requirements ==
  * *Windows*
    * Windows XP or later
    * MS Visual studio 2010 (SP1) or later. I've not created project for this VS 2008 yet.
@@ -498,14 +500,14 @@ Integration process is simple:
  * *Linux*
    * GNU Compiler (C++), I've not yet figured out the minimum version, let me know if you do.
 
-==6.2. Windows==
+==7.2. Windows==
  # [http://code.google.com/p/baical/source/checkout Checkout] the project's source code. For example you checkout it to "C:\P7"
  # Open "C:\P7\P7.sln" solution in Visual studio
  # Select "Release" solution configuration for Win32 or X64 platform 
  # Rebuild the solution. Command from menu: "Build\Rebuild solution"
  # Folder "C:\P7\Binaries" will contain all necessary files
 
-==6.3. Linux==
+==7.3. Linux==
 Before building you need to [http://code.google.com/p/baical/source/checkout checkout] the project's source code. For example you checkout it to "/home/Guest/Projects/P7"
 
 Building library:
@@ -527,4 +529,3 @@ Building complex tests:
  # Open terminal and change current directory to "/home/Guest/Projects/P7/Tests/Trace/"
  # execute _make_ command
  # If build is successful the executable file will be located in "/home/Guest/Projects/P7/Binaries"
-
