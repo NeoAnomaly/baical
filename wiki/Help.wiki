@@ -2,6 +2,6 @@
 
 
  * [http://code.google.com/p/baical/wiki/Introduction Introduction]
- * [http://code.google.com/p/baical/wiki/Baical Baical.] Receive & process incoming trace messages & telemetry samples;
- * [http://code.google.com/p/baical/wiki/Angara Angara.] Transfer windows driver [http://msdn.microsoft.com/en-us/library/windows/desktop/bb968803(v=vs.85).aspx messages] to Baical server;
- * [http://code.google.com/p/baical/wiki/P7Trace P7 library.] Process and deliver over network your application trace messages & telemetry samples to Baical server;
+ * [http://code.google.com/p/baical/wiki/Baical Baical.] Receive & process incoming trace messages & telemetry samples
+ * [http://code.google.com/p/baical/wiki/Angara Angara.] Transfer windows driver [http://msdn.microsoft.com/en-us/library/windows/desktop/bb968803(v=vs.85).aspx messages] to Baical server
+ * [http://code.google.com/p/baical/wiki/P7Trace P7 library.] Process and deliver over network your application trace messages & telemetry samples to Baical server
