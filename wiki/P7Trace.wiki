@@ -106,7 +106,7 @@ _Return_: New reference counter value<br/>
 
 
 
-==3.3 !Release()==
+==3.3 Release()==
 _Description_: Decrease object reference counter, 0 value is equal to self-destruction<br/>
 
 _Prototype_:
@@ -237,7 +237,7 @@ _Return_:
   * ECLIENT_STATUS_WRONG_PARAMETERS - input parameter is wrong, channel is not used.
 
 
-==3.8 !Sent()==
+==3.8 Sent()==
 _Description_: Send data to server<br/>
 
 _Prototype_:
@@ -262,7 +262,7 @@ _Return_:
   * ECLIENT_STATUS_NO_FREE_BUFFERS - no free memory to process request
   * ECLIENT_STATUS_WRONG_PARAMETERS - parameters are wrong
 
-==3.9 !Share()==
+==3.9 Share()==
 _Description_: share current P7 object instance in address space of the current process, to retrieve previously shared P7 instance use function {{{P7_Get_Shared(tXCHAR *i_pName);}}}<br/>
 
 _Prototype_:
@@ -415,7 +415,7 @@ _Arguments_: see IP7_Trace::Trace() description<br/>
 _Return_: see IP7_Trace::Trace() description<br/>
 
 
-==4.7 !Share()==
+==4.7 Share()==
 _Description_: share current P7 trace object instance in address space of the current process, to retrieve previously shared P7 trace instance use function {{{P7_Get_Shared_Trace(tXCHAR *i_pName);}}}<br/>
 
 _Prototype_:
@@ -471,7 +471,7 @@ tINT32 IP7_Trace::Add_Ref();
 _Arguments_: No<br/>
 _Return_: New reference counter value<br/>
 
-==5.3 !Release()==
+==5.3 Release()==
 _Description_: Decrease object reference counter, 0 value is equal to self-destruction<br/>
 
 _Prototype_:
@@ -482,7 +482,7 @@ tINT32 IP7_Trace::Release();
 _Arguments_: No<br/>
 _Return_: New reference counter value<br/>
 
-==5.4 !Create()==
+==5.4 Create()==
 _Description_: Create additional named counter, you can create 256 counters max per session<br/>
 
 _Prototype_:
@@ -508,7 +508,7 @@ _Return_:<br/>
   * TRUE - counter was added successfully
   * FALSE - fail, name is not unique or all 32 counters clots are busy
 
-==5.5 !Add()==
+==5.5 Add()==
 _Description_: Add sample value to the counter<br/>
 
 _Prototype_:
@@ -526,7 +526,7 @@ _Return_:<br/>
   * TRUE - success
   * FALSE - fail, usually when connection with Baical is not established
 
-==5.6 !Find()==
+==5.6 Find()==
 _Description_: Find counter's ID by name<br/>
 
 _Prototype_:
@@ -545,7 +545,7 @@ _Return_:<br/>
   * FALSE - fail, no counter with such name
 
 
-==5.7 !Share()==
+==5.7 Share()==
 _Description_: share current P7 telemetry object instance in address space of the current process, to retrieve previously shared P7 telemetry instance use function {{{P7_Get_Shared_Telemetry(tXCHAR *i_pName);}}}<br/>
 
 _Prototype_:
@@ -574,29 +574,33 @@ _Return_: If function fails it will return NULL. Details will be located inside 
 The example demonstrates how to:
  * Create P7 client 
  * Create 2 trace channels
+ * Create telemetry channels
  * Send few traces
+ * Send 1 000 000 telemetry samples
  * Cleanup all objects
-[http://baical.googlecode.com/svn/trunk/Infrastructure/P7/Tests/Example/ Source code] is also available and you are able to build it under Windows or Linux. Build instructions are located at the bottom of the page.
+[http://baical.googlecode.com/svn/trunk/Tests/Example/ Source code] is also available and you are able to build it under Windows or Linux. Build instructions are located at the bottom of the page.
 
 {{{
-#include <stdio.h>
+#include <stdlib.h>
 
 #include "PTypes.h"
 #include "GTypes.h"
 
 #include "P7_Client.h"
-#include "P7_Extensions.h"
+#include "P7_Trace.h"
+#include "P7_Telemetry.h"
 
 
 int main(int i_iArgC, char* i_pArgV[])
 {
-    IP7_Client *l_pClient  = NULL;
-    IP7_Trace  *l_pTrace_1 = NULL;
-    IP7_Trace  *l_pTrace_2 = NULL;
-    tUINT32     l_dwIdx    = 0;
+    IP7_Client    *l_pClient    = NULL;
+    IP7_Trace     *l_pTrace_1   = NULL;
+    IP7_Trace     *l_pTrace_2   = NULL;
+    tUINT32        l_dwIdx      = 0;
+    IP7_Telemetry *l_pTelemetry = NULL;
+    tUINT8         l_pTID       = 0;
 
-    printf("P7.Trace example application\n");
-
+    //create P7 client object
     l_pClient = P7_Create_Client(0);
 
     if (NULL == l_pClient)
@@ -604,18 +608,34 @@ int main(int i_iArgC, char* i_pArgV[])
         goto l_lblExit;
     }
 
-    l_pTrace_1 = P7_Create_Trace(l_pClient, TM("Test channel 1"));
+    //create P7 telemetry object
+    l_pTelemetry = P7_Create_Telemetry(l_pClient, TM("Telemetry channel 1"));
+    if (NULL == l_pTelemetry)
+    {
+        goto l_lblExit;
+    }
+
+    //register telemetry counter, it has values in range 0 ... 1023
+    if (FALSE == l_pTelemetry->Create(TM("Test counter"), 0, 1023, 1000, 1, &l_pTID))
+    {
+        goto l_lblExit;
+    }
+
+    //create P7 trace object 1
+    l_pTrace_1 = P7_Create_Trace(l_pClient, TM("Trace channel 1"));
     if (NULL == l_pTrace_1)
     {
         goto l_lblExit;
     }
 
-    l_pTrace_2 = P7_Create_Trace(l_pClient, TM("Test channel 2"));
+    //create P7 trace object 2
+    l_pTrace_2 = P7_Create_Trace(l_pClient, TM("Trace channel 2"));
     if (NULL == l_pTrace_2)
     {
         goto l_lblExit;
     }
 
+    //send few trace messages
     l_pTrace_1->P7_TRACE(0, TM("Test trace message #%d"), l_dwIdx ++);
     l_pTrace_1->P7_INFO(0, TM("Test info message #%d"), l_dwIdx ++);
     l_pTrace_1->P7_DEBUG(0, TM("Test debug message #%d"), l_dwIdx ++);
@@ -625,7 +645,18 @@ int main(int i_iArgC, char* i_pArgV[])
     
     l_pTrace_2->P7_QTRACE(1, 0, TM("Test quick trace on channel %d"), 2);
 
+    //send 1 million telemetry samples
+    for (tUINT64 l_qwI = 0ULL; l_qwI < 1000000ULL; l_qwI ++)
+    {
+        l_pTelemetry->Add(l_pTID, (l_qwI & 0x3FF));
+    }
 l_lblExit:
+    if (l_pTelemetry)
+    {
+        l_pTelemetry->Release();
+        l_pTelemetry = NULL;
+    }
+
     if (l_pTrace_1)
     {
         l_pTrace_1->Release();
@@ -648,16 +679,16 @@ l_lblExit:
 }
 }}}
 
-To run the test use this command line example, just replace IP address to your Baical IP:
+To run the test use this command line example, just need to replace IP address if you run Baical on different PC:
 {{{
 P7_Example /P7.Addr=127.0.0.1
 }}}
 
-N.B.: Do not forget to setup your firewall, it can block traffic.
+N.B.: Do not forget to setup your firewall (UDP, port: 9009), it can block traffic.
 
 =7. Integration=
 Integration process is simple:
- # Build the [http://baical.googlecode.com/svn/Trunk/P7/ library]
+ # Build the [http://baical.googlecode.com/svn/trunk/ library]
  # Include into your project next headers
     * _PTypes.h_
       * Linux: {P7}\Shared\Platforms\Linux_x86
