@@ -369,7 +369,7 @@ tBOOL IP7_Trace::Trace(tUINT16         i_wTrace_ID,
 }}}
 
 _Arguments_: 
-  * i_wTrace_ID {in} - HARDCODED trace ID, possible range is [0 .. !1023]. This ID is used to match trace data and trace format string on server side. You can specify this parameter in range [1..1024] if you want to send a trace as quickly as possible. Otherwise you can put 0 - and this function will work a little bit slowly.
+  * i_wTrace_ID {in} - HARDCODED trace ID, possible range is (0 .. 1023). This ID is used to match trace data and trace format string on server side. You can specify this parameter in range [1..1024] if you want to send a trace as quickly as possible. Otherwise you can put 0 - and this function will work a little bit slowly.
   * i_eLevel {in} - trace level (error, warning, debug, etc) see list of the possible values inside enum eP7Trace_Level
   * i_wModule_ID {in} - used specified value, you can use it on server side for filtering, searching, highlighting. 
   * i_wLine {in} - source file line number from where  your trace  is  called. Usually macro __LINE__ is used
@@ -694,10 +694,10 @@ Integration process is simple:
       * Linux: {P7}\Shared\Platforms\Linux_x86
       * Windows: {P7}\Shared\Platforms\Windows_x86
     * _GTypes.h_: {P7}\Shared\
-    * !_P7_Client.h_: {P7}\Headers\
-    * !_P7_Extensions.h_: {P7}\Headers\
+    * _!P7_Client.h_: {P7}\Headers\
+    * _!P7_Extensions.h_: {P7}\Headers\
  # Link from {P7}\Binaries\
-    * Windows: _Ws2_32.lib_ and !_P7Client_XXX.lib_ libraries where XXX is postfix 32, 32_d, 64, 64_d
+    * Windows: _Ws2_32.lib_ and _!P7Client_XXX.lib_ libraries where XXX is postfix 32, 32_d, 64, 64_d
     * Linux : _libP7.a_ library
 
 =8. Compilation=
