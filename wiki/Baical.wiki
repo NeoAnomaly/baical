@@ -146,7 +146,7 @@ It is powerful module and it give to developer all necessary information about s
 Here is main window view: <br/>
 [http://baical.googlecode.com/svn/wiki/Images/P7Viewer.png]
 
-Through menu (right top button *O*) you can:
+Through menu (right top button *O*) or hot-keys you can:
  * Switch on/off columns
  * Change time format (for some use cases the string _08.10.2012 21:05:22.064'263"1_ is too long and it is sufficient to use short representation _05:22.064'263"1_)
  * Find traces
