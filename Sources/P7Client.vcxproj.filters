@@ -41,6 +41,15 @@
     <ClInclude Include="Telemetry.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\Headers\P7_Server.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Headers\P7_Telemetry.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Headers\P7_Trace.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers">
