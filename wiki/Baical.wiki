@@ -33,7 +33,7 @@ All options are stored inside configuration file (*Baical.xml*, UTF-16). Format 
 <Root>
     <!--
     Core parameters
-     Logging  : has 2 possible values 1/0, it allow to switch on/off internal
+     Logging  : has 2 possible values 1/0, it allow to switch on/off interlal
                 logger which write all application events to log file
      Verbosity: Level of verbosity for internal logger, has next values:
                 DEBUG(0), INFO(1), WARNING(2), ERROR(3), CRITICAL(4)
@@ -51,20 +51,58 @@ All options are stored inside configuration file (*Baical.xml*, UTF-16). Format 
         <Offline Max="64" Erase="0" />
     </Element>
     <Element Name="Trace Viewer" GUID="{C6206BEB-C4FA-B267-15AA-B3B2B4AC316D}">
-      ...
+        <Window X="36" Y="45" W="800" H="585" />
+        <Traces>
+            <Font Name="Lucida Console" Size="11" />
+            <Headers>
+                <Index Visible="1" Width="78" />
+                <ID Visible="1" Width="44" />
+                <Time Width="176" Format="1" />
+                <Level Visible="1" Width="106" />
+                <Proc Visible="1" Width="41" />
+                <Thread Visible="1" Width="66" />
+                <Module Visible="1" Width="46" />
+            </Headers>
+        </Traces>
+        <Predicates>
+            <Item ID="0" Text="$Thread$ = &quot;0xFFAA&quot; |&#10;$Text$ &lt;&lt; &quot;Baical&quot; |&#10;&quot;1010&quot; &lt; $ID$" />
+            <Item ID="1" Text="$ID$=&quot;10&quot;" />
+            <Item ID="2" Text="$Thread$ = &quot;0xFFAA&quot; |&#10;$Text$ &lt;&lt; &quot;Baical&quot;" />
+            <Item ID="3" Text="$Level$ &lt; &quot;ERROR&quot;" />
+            <Item ID="4" Text="$Level$ &lt; &quot;WARNING&quot;" />
+            <Item ID="5" Text="$Index$ &gt;= &quot;500&quot; &amp; $Index$ &lt;= &quot;100000&quot;" />
+            <Item ID="6" Text="$Module$ &gt; &quot;2&quot;" />
+        </Predicates>
+        <Colors>
+            <Scheme Name="Default">
+                <Item ColorT="-16777216" ColorB="-986896" Predicate="$Level$ = &quot;TRACE&quot;" />
+                <Item ColorT="-16777216" ColorB="-3149617" Predicate="$Level$ = &quot;DEBUG&quot;" />
+                <Item ColorT="-16777216" ColorB="-995376" Predicate="$Level$ = &quot;INFO&quot;" />
+                <Item ColorT="-16777216" ColorB="-6579216" Predicate="$Level$ = &quot;WARNING&quot;" />
+                <Item ColorT="-16777216" ColorB="-12105729" Predicate="$Level$ = &quot;ERROR&quot;" />
+                <Item ColorT="-16777216" ColorB="-16777028" Predicate="$Level$ = &quot;CRITICAL&quot;" />
+            </Scheme>
+        </Colors>
     </Element>
     <Element Name="P7 Trace storage" GUID="{C5206AEB-D40A-BC07-65C6-2AB9FB8C992D}">
-      ...
+        <!--
+        Path : directory where traces will be stored. Empty string means that all
+               traces will be stored in the same directory where Baical server is
+               located  
+               N.B. You should specify only existing directory ! It will be not 
+                    created atomatically
+        -->
+        <Directory Path="" />
     </Element>
     <Element Name="P7 Provider" GUID="{4CA06FED-F30A-4607-A5B7-3DB1FA7E775A}">
-      ...
+        <Network Port="9009" />
     </Element>
 </Root>
 }}}
 
 <br/>
 =4. Plugins =
-==4.1. P7.Provider ==
+==4.1. P7 provider ==
 Plugin is used to receive packets from [http://code.google.com/p/baical/wiki/P7Trace P7.Trace] library. If you instrument your code by that library and decide to send trace messages - P7.Provider plugin will receive them. <br/>
 For communication it uses subset of Transmission Control Protocol, optimized for high speed on one direction and low speed on another one. At startup plugin enumerate all network interfaces and open UDP port 9009 on every interface.<br/>
 Port value can be changed through XML parameter:
@@ -75,7 +113,7 @@ Port value can be changed through XML parameter:
 }}}
 Plugin support IPv6.
 
-==4.2. P7.Storage ==
+==4.2. P7 trace storage ==
 Plugin is used to save packets received from [http://code.google.com/p/baical/wiki/P7Trace P7.Trace] library to local file.<br/>
 By default all trace files are stored in local Baical folder: `{Baical}\{IP address}\{Date + Process Name}\{Channel name}`
 But you can change default location through XML:
@@ -90,7 +128,7 @@ But you can change default location through XML:
 </Element>
 }}}
 
-==4.3. P7.Viewer ==
+==4.3. P7 trace viewer ==
 Plugin is used to view trace messages sent by [http://code.google.com/p/baical/wiki/P7Trace P7.Trace] library.
 It is powerful module and it give to developer all necessary information about sender:
  * Trace message ID
@@ -105,6 +143,7 @@ It is powerful module and it give to developer all necessary information about s
  * Function name
  * Source file line number
 
+Here is main window view: <br/>
 [http://baical.googlecode.com/svn/wiki/Images/P7Viewer.png]
 
 Through menu (right top button *O*) you can:
@@ -113,6 +152,8 @@ Through menu (right top button *O*) you can:
  * Find traces
  * Filter traces
  * Highlight traces
+ * Create color schemes
+[http://baical.googlecode.com/svn/wiki/Images/P7Viewer_Menu.png]
 
 For finding, filtering and highlighting match expressions are used. This is very flexible way to select some trace messages and ignore other ones.<br/>
 Here are some match expressions examples:
@@ -130,8 +171,9 @@ $Time$ >= "30.08.2011 16:08" & ( ( "0x1010AC" = $Thread$ ) | ( "0x1010BC" = $Thr
 }}}
 
 To read more about match expressions open Find or Filter or Highlight dialogs and click "Help" button.
+[http://baical.googlecode.com/svn/wiki/Images/P7Viewer_Find.png]
 
-==4.4. Syslog ==
-Provider & storage plugins are under development.
+==4.4. P7 telemetry storage ==
+==4.5. P7 telemetry viewer ==
 
 <br/>
