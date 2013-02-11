@@ -24,5 +24,14 @@ Changes list:
 -------------------
 =Old versions=
  * [http://baical.googlecode.com/files/Baical_v0.4.zip Baical v0.4]
+ * [http://baical.googlecode.com/files/Baical_v0.3.4.zip Baical v0.3.4]
+ * [http://baical.googlecode.com/files/Baical_v0.3.2.zip Baical v0.3.2]
+ * [http://baical.googlecode.com/files/Baical_v0.3.0.zip Baical v0.3.0]
+ * [http://baical.googlecode.com/files/Baical_v0.2.3.zip Baical v0.2.3]
+ * [http://baical.googlecode.com/files/Baical_v0.2.1.zip Baical v0.2.1]
  * [http://baical.googlecode.com/files/Angara_v0.9.7.zip Angara v0.9.7] 
- * [http://code.google.com/p/baical/source/checkout P7 library] 
+ * [http://baical.googlecode.com/files/Angara_v0.9.5.zip Angara v0.9.5] 
+ * [http://baical.googlecode.com/files/Angara_v0.9.2.zip Angara v0.9.2] 
+ * [http://baical.googlecode.com/files/Angara_v0.9.1.zip Angara v0.9.1] 
+ * [http://baical.googlecode.com/files/Angara_v0.9.0.zip Angara v0.9.0] 
+ * [http://baical.googlecode.com/files/Angara_v0.8.5.zip Angara v0.8.5] 
