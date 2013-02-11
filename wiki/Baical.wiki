@@ -204,8 +204,7 @@ It is powerful module and designed to process big amount of real-time data. Here
  * Different algorithms for samples processing;
  * Managing counters states (on/off) on remote PC;
 
-Base plugin views:<br/>
-[http://baical.googlecode.com/svn/wiki/Images/P7Telemetry.png]
+Base plugin views:
 [http://baical.googlecode.com/svn/wiki/Images/P7Telemetry_Menu.png]
 [http://baical.googlecode.com/svn/wiki/Images/P7Telemetry_Algo.png]
 
