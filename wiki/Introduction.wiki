@@ -7,7 +7,7 @@ And easy to imagine why for the company collecting and analysis any controller's
 A lot of water has flowed under the bridge since that time, HW and SW solutions has been changed many times, but objectives are still the same:
  * Device should send detailed telemetry & debug information; it will save a lot of debugging time.
  * Such delivery should not influence on main device's workflow even if you send a lot of information
- * Speed is priority
+ * Speed is highest priority - receive all, filter later
  * Adding new types of debug & trace packets should not be a problem for software and hardware engineers.
 
 Currently I have some experience in this area and I would like to share it with other engineers in the hope that it will help to work more productive and release more stable products.
