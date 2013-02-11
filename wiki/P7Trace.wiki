@@ -333,7 +333,7 @@ _Arguments_: No<br/>
 _Return_: New reference counter value<br/>
 
 
-===3.2.4 !Set_Verbosity()===
+==4.4 !Set_Verbosity()==
 _Description_: Set minimal verbosity level. Traces with less level will be dropped<br/>
 
 _Prototype_:
@@ -415,10 +415,162 @@ _Arguments_: see IP7_Trace::Trace() description<br/>
 _Return_: see IP7_Trace::Trace() description<br/>
 
 
-=4. P7 Telemetry interface=
-Under construction
+==4.7 !Share()==
+_Description_: share current P7 trace object instance in address space of the current process, to retrieve previously shared P7 trace instance use function {{{P7_Get_Shared_Trace(tXCHAR *i_pName);}}}<br/>
 
-=5. Example=
+_Prototype_:
+{{{tBOOL Share(const tXCHAR *i_pName);}}}
+
+_Arguments_: 
+   * i_pName {in} - shared object name, should be unique for current process
+      
+_Return_: 
+  * TRUE - object instance was shared successfully
+  * FALSE - provided name is not unique for current process
+
+==4.8 !P7_Get_Shared_Trace()==
+_Description_: retrieve previously shared P7 instance. Doesn't work for Linux yet<br/>
+_Prototype_:
+{{{
+IP7_Trace *P7_Get_Shared_Trace(const tXCHAR *i_pName);
+}}}
+
+_Arguments_:  
+ * i_pName {in} - shared object name, should be unique for current process
+
+_Return_: If function fails it will return NULL. Details will be located inside log file (Windows) or printed to console (Linux).
+
+=5. P7 Telemetry interface=
+Interface is repsonsable for processing telemetry samples. Interface definition located in {{{[P7]\Headers\P7_Telemetry.h}}} and name is `IP7_Telemetry`<br/>
+Here is list of interface and helper functions.
+
+==5.1 !P7_Create_Trace==
+_Description_: create an instance of IP7_Telemetry interface. You can create up to 32 IP7_Telemetry objects per one IP7_Client object<br/>
+_Prototype_:
+{{{
+IP7_Telemetry *P7_Create_Telemetry(IP7_Client   *i_pClient,
+                                  const tXCHAR *i_pName
+                                 );
+}}}
+
+_Arguments_:  
+ * i_pClient {in} - IP7_Client object previously created
+ * i_pName {in} - Telemetry channel name. UTF-16 or UTF-8 (depending on OS) string. 
+
+_Return_: If function fails it will return NULL. Details will be located inside log file (Windows) or printed to console (Linux).
+
+
+==5.2 !Add_Ref()==
+_Description_: Increase object reference counterm, initial object value is 1<br/>
+
+_Prototype_:
+{{{
+tINT32 IP7_Trace::Add_Ref();
+}}}
+
+_Arguments_: No<br/>
+_Return_: New reference counter value<br/>
+
+==5.3 !Release()==
+_Description_: Decrease object reference counter, 0 value is equal to self-destruction<br/>
+
+_Prototype_:
+{{{
+tINT32 IP7_Trace::Release();
+}}}
+
+_Arguments_: No<br/>
+_Return_: New reference counter value<br/>
+
+==5.4 !Create()==
+_Description_: Create additional named counter, you can create 256 counters max per session<br/>
+
+_Prototype_:
+{{{
+tBOOL Create(const tXCHAR  *i_pName, 
+             tINT64         i_llMin,
+             tINT64         i_llMax,
+             tINT64         i_llAlarm,
+             tUINT8         i_bOn,
+             tUINT8        *o_pID 
+            );
+}}}
+
+_Arguments_:<br/>
+ * i_pName {in} - Telemetry counter name. UTF-16 or UTF-8 (depending on OS) string. 
+ * i_llMin {in} - min value of counter.
+ * i_llMax {in} - max value of counter
+ * i_llAlarm {in} - warning counter value, value should be in range [i_llMin < i_llAlarm < i_llMax].
+ * i_bOn {in} - counter state after creation, TRUE = ON, FALSE = OFF. If counter is OFF you can enable it later by Baical 
+ * o_pID {out} - ID of the newly created counter, this value will be used later in Add() function. 
+
+_Return_:<br/>
+  * TRUE - counter was added successfully
+  * FALSE - fail, name is not unique or all 32 counters clots are busy
+
+==5.5 !Add()==
+_Description_: Add sample value to the counter<br/>
+
+_Prototype_:
+{{{
+tBOOL Add(tUINT8 i_bID, 
+          tINT64 i_llValue 
+         );
+}}}
+
+_Arguments_:<br/>
+ * i_bID {in} - counter's ID. 
+ * i_llValue {in} - sample value.
+
+_Return_:<br/>
+  * TRUE - success
+  * FALSE - fail, usually when connection with Baical is not established
+
+==5.6 !Find()==
+_Description_: Find counter's ID by name<br/>
+
+_Prototype_:
+{{{
+tBOOL Find(const tXCHAR *i_pName, 
+           tUINT8       *o_pID
+          );
+}}}
+
+_Arguments_:<br/>
+ * i_pName {in} - Telemetry counter name. UTF-16 or UTF-8 (depending on OS) string. 
+ * o_pID {out} - ID of the counter. 
+
+_Return_:<br/>
+  * TRUE - success
+  * FALSE - fail, no counter with such name
+
+
+==5.7 !Share()==
+_Description_: share current P7 telemetry object instance in address space of the current process, to retrieve previously shared P7 telemetry instance use function {{{P7_Get_Shared_Telemetry(tXCHAR *i_pName);}}}<br/>
+
+_Prototype_:
+{{{tBOOL Share(const tXCHAR *i_pName);}}}
+
+_Arguments_: 
+   * i_pName {in} - shared object name, should be unique for current process
+      
+_Return_: 
+  * TRUE - object instance was shared successfully
+  * FALSE - provided name is not unique for current process
+
+==5.8 !P7_Get_Shared_Telemetry()==
+_Description_: retrieve previously shared P7 telemetry instance. Doesn't work for Linux yet<br/>
+_Prototype_:
+{{{
+IP7_Telemetry *P7_Get_Shared_Telemetry(const tXCHAR *i_pName);
+}}}
+
+_Arguments_:  
+ * i_pName {in} - shared object name, should be unique for current process
+
+_Return_: If function fails it will return NULL. Details will be located inside log file (Windows) or printed to console (Linux).
+
+=6. Example=
 The example demonstrates how to:
  * Create P7 client 
  * Create 2 trace channels
@@ -503,7 +655,7 @@ P7_Example /P7.Addr=127.0.0.1
 
 N.B.: Do not forget to setup your firewall, it can block traffic.
 
-=6. Integration=
+=7. Integration=
 Integration process is simple:
  # Build the [http://baical.googlecode.com/svn/Trunk/P7/ library]
  # Include into your project next headers
@@ -517,8 +669,8 @@ Integration process is simple:
     * Windows: _Ws2_32.lib_ and _P7Client_XXX.lib_ libraries where XXX is postfix 32, 32_d, 64, 64_d
     * Linux : _libP7.a_ library
 
-=7. Compilation=
-==7.1. Requirements ==
+=8. Compilation=
+==8.1. Requirements ==
  * *Windows*
    * Windows XP or later
    * MS Visual studio 2010 (SP1) or later. I've not created project for this VS 2008 yet.
@@ -526,14 +678,14 @@ Integration process is simple:
  * *Linux*
    * GNU Compiler (C++), I've not yet figured out the minimum version, let me know if you do.
 
-==7.2. Windows==
+==8.2. Windows==
  # [http://code.google.com/p/baical/source/checkout Checkout] the project's source code. For example you checkout it to "C:\P7"
  # Open "C:\P7\P7.sln" solution in Visual studio
  # Select "Release" solution configuration for Win32 or X64 platform 
  # Rebuild the solution. Command from menu: "Build\Rebuild solution"
  # Folder "C:\P7\Binaries" will contain all necessary files
 
-==7.3. Linux==
+==8.3. Linux==
 Before building you need to [http://code.google.com/p/baical/source/checkout checkout] the project's source code. For example you checkout it to "/home/Guest/Projects/P7"
 
 Building library:
