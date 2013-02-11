@@ -126,7 +126,7 @@ tBOOL IP7_Client::Get_Status(sP7C_Status *o_pStatus);
 }}}
 
 _Arguments_: 
-   * o_pStatus {out} - structure contains next fields filled by P7_Client object:
+   * o_pStatus {out} - structure contains next fields filled by !P7_Client object:
      * bConnected - bool value, TRUE - connection with server is established, FALSE - otherwise
      * dwResets - count of connection drops 
 
@@ -141,7 +141,7 @@ tBOOL IP7_Client::Get_Info(sP7C_Info *o_pInfo);
 }}}
 
 _Arguments_: 
-   * o_pInfo {out} - structure contains next fileds filled by P7_Client object:
+   * o_pInfo {out} - structure contains next fileds filled by !P7_Client object:
      * dwMem_Used - amount of memory used by object for delivery buffers
      * dwMem_Free - amount of free memory for delivery buffers
      * dwReject_Mem - count of rejected call IP7_Client::Sent(). Reason - no memory.
@@ -249,7 +249,7 @@ eClient_Status IP7_Client::Sent(tUINT32          i_dwChannel_ID,
 }}}
 
 _Arguments_: 
-   * i_dwChannel_ID {in} - channel ID, you can obtain in by calling IP7_Client::Register_Channel()
+   * i_dwChannel_ID {in} - channel ID, you can obtain in by calling !IP7_Client::!Register_Channel()
    * i_pChunks {in} - pointer to the array of data chunks, every chunk has next fields:
       * pData - data pointer
       * dwSize - data size (in bytes)
@@ -369,7 +369,7 @@ tBOOL IP7_Trace::Trace(tUINT16         i_wTrace_ID,
 }}}
 
 _Arguments_: 
-  * i_wTrace_ID {in} - HARDCODED trace ID, possible range is [0 .. 1023]. This ID is used to match trace data and trace format string on server side. You can specify this parameter in range [1..1024] if you want to send a trace as quickly as possible. Otherwise you can put 0 - and this function will work a little bit slowly.
+  * i_wTrace_ID {in} - HARDCODED trace ID, possible range is [0 .. !1023]. This ID is used to match trace data and trace format string on server side. You can specify this parameter in range [1..1024] if you want to send a trace as quickly as possible. Otherwise you can put 0 - and this function will work a little bit slowly.
   * i_eLevel {in} - trace level (error, warning, debug, etc) see list of the possible values inside enum eP7Trace_Level
   * i_wModule_ID {in} - used specified value, you can use it on server side for filtering, searching, highlighting. 
   * i_wLine {in} - source file line number from where  your trace  is  called. Usually macro __LINE__ is used
@@ -386,7 +386,7 @@ _Return_: Function return only 2 possible values:
  * TRUE  - if trace has been posted in delivery queue
  * FALSE - can be returned by the next reasons (in descending priority order):
   * There is no connection with Baical server 
-  * Current trace level (i_eLevel) has  less  priority  than current verbosity - see function Set_Verbosity
+  * Current trace level (i_eLevel) has  less  priority  than current verbosity - see function !Set_Verbosity
   * P7 network engine did not have enough  time  to  deliver all your traces. This can happen when  you  are  sending events faster than Baical server can process  them. But it is difficult to reach this limit. Engine normally process 500 000 traces per second on Intel Core 2 Duo.
   * IP7_Trace object is not initialized  properly (internal)
   * Memory allocation problems(internal)
@@ -395,7 +395,7 @@ _Return_: Function return only 2 possible values:
 
 
 ==4.6 !Trace_Embedded()==
-_Description_: Function is equal to IP7_Trace::Trace() with one exception: Trace_Embedded() can be used inside another function with variable arguments<br/>
+_Description_: Function is equal to IP7_Trace::Trace() with one exception: !Trace_Embedded() can be used inside another function with variable arguments<br/>
 
 _Prototype_:
 {{{
@@ -500,7 +500,7 @@ _Arguments_:<br/>
  * i_pName {in} - Telemetry counter name. UTF-16 or UTF-8 (depending on OS) string. 
  * i_llMin {in} - min value of counter.
  * i_llMax {in} - max value of counter
- * i_llAlarm {in} - warning counter value, value should be in range [i_llMin < i_llAlarm < i_llMax].
+ * i_llAlarm {in} - warning counter value, value should be in range i_llMin .. i_llMax.
  * i_bOn {in} - counter state after creation, TRUE = ON, FALSE = OFF. If counter is OFF you can enable it later by Baical 
  * o_pID {out} - ID of the newly created counter, this value will be used later in Add() function. 
 
@@ -694,10 +694,10 @@ Integration process is simple:
       * Linux: {P7}\Shared\Platforms\Linux_x86
       * Windows: {P7}\Shared\Platforms\Windows_x86
     * _GTypes.h_: {P7}\Shared\
-    * _P7_Client.h_: {P7}\Headers\
-    * _P7_Extensions.h_: {P7}\Headers\
+    * !_P7_Client.h_: {P7}\Headers\
+    * !_P7_Extensions.h_: {P7}\Headers\
  # Link from {P7}\Binaries\
-    * Windows: _Ws2_32.lib_ and _P7Client_XXX.lib_ libraries where XXX is postfix 32, 32_d, 64, 64_d
+    * Windows: _Ws2_32.lib_ and !_P7Client_XXX.lib_ libraries where XXX is postfix 32, 32_d, 64, 64_d
     * Linux : _libP7.a_ library
 
 =8. Compilation=
