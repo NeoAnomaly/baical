@@ -60,7 +60,8 @@ Speed /P7.Addr=192.168.0.1 /P7.PSize=1472 /P7.Pool=8192
 You can build them in Windows and Linux, build instructions are located at the bottom of the page.
 
 =3 P7 Client=
-Interface is repsonsable for delivering data from source to destination over IP network. Interface definition located in {{{[P7]\Headers\P7_Client.h}}} and name is `IP7_Client`
+Interface is repsonsable for delivering data from source to destination over IP network. Interface definition located in {{{[P7]\Headers\P7_Client.h}}} and name is `IP7_Client`<br/>
+Here is list of interface and helper functions.
 
 ==3.1 !P7_Create_Client()==
 _Description_: create an instance of IP7_Client interface<br/>
@@ -105,7 +106,7 @@ _Return_: New reference counter value<br/>
 
 
 
-==3.3 Release()==
+==3.3 !Release()==
 _Description_: Decrease object reference counter, 0 value is equal to self-destruction<br/>
 
 _Prototype_:
@@ -236,7 +237,7 @@ _Return_:
   * ECLIENT_STATUS_WRONG_PARAMETERS - input parameter is wrong, channel is not used.
 
 
-==3.8 Sent()==
+==3.8 !Sent()==
 _Description_: Send data to server<br/>
 
 _Prototype_:
@@ -261,7 +262,7 @@ _Return_:
   * ECLIENT_STATUS_NO_FREE_BUFFERS - no free memory to process request
   * ECLIENT_STATUS_WRONG_PARAMETERS - parameters are wrong
 
-==3.9 Share()==
+==3.9 !Share()==
 _Description_: share current P7 object instance in address space of the current process, to retrieve previously shared P7 instance use function {{{P7_Get_Shared(tXCHAR *i_pName);}}}<br/>
 
 _Prototype_:
@@ -288,7 +289,9 @@ _Return_: If function fails it will return NULL. Details will be located inside 
 
 
 =4 P7 Trace interface=
-IP7_Trace
+Interface is repsonsable for processing trace messages. Interface definition located in {{{[P7]\Headers\P7_Trace.h}}} and name is `IP7_Trace`<br/>
+Here is list of interface and helper functions.
+
 ==4.1 !P7_Create_Trace==
 _Description_: create an instance of IP7_Trace interface. You can create up to 32 IP7_Trace objects per one IP7_Client object<br/>
 _Prototype_:
