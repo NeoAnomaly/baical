@@ -72,7 +72,7 @@ IP7_Client * P7_Create_Client(tXCHAR *i_pArgs);
 
 _Arguments_:  
  * i_pArgs {in} - configuration string. The string can contains next parameters in any combinations:
-   * /P7.Addr - Set server address (IPV4, IPV6, NetBios name), default value is 127.0.0.1. Examples:
+   * /P7.Addr - Set server address (IPV4, IPV6, !NetBios name), default value is 127.0.0.1. Examples:
      * /P7.Addr=127.0.0.1
      * /P7.Addr=192.168.0.1
      * /P7.Addr=::1
