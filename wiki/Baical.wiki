@@ -170,8 +170,12 @@ $Time$ >= "30.08.2011 16:08" & ( ( "0x1010AC" = $Thread$ ) | ( "0x1010BC" = $Thr
 ($Module$ = "256") & ($Level$ = "ERROR") 
 }}}
 
-To read more about match expressions open Find or Filter or Highlight dialogs and click "Help" button.
 [http://baical.googlecode.com/svn/wiki/Images/P7Viewer_Find.png]
+
+You can use match expressions for color schemes creation:
+[http://baical.googlecode.com/svn/wiki/Images/P7Viewer_Colors.png]
+
+To read more about match expressions open Find or Filter or Highlight dialogs and click "Help" button.
 
 ==4.4. P7 telemetry storage ==
 Plugin is used to save packets received from [http://code.google.com/p/baical/wiki/P7Trace P7.Telemetry] library to local file.<br/>
