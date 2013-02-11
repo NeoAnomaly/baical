@@ -18,8 +18,10 @@ The library consists of 3 parts:
       * Intel i7-870, 50 000 traces per second - 0,5% CPU, max ~2.5 millions
       * Intel E8400 (Core 2 duo), 15 000 traces per second - 0,5% CPU, max ~ 750 000
       * ARM 926EJ (v5), 1 000 traces per second - 0,5% CPU, max ~20 000
+ # 400 ns for processing one trace message (sent(...) -> network -> Baical serve -> HDD)
+ # 300 ns for processing one telemetry sample (add(...) -> network -> Baical serve -> HDD)
  # Thread safe 
- # Process your variable arguments traces, like:
+ # Process variable arguments traces, like:
 {{{ 
 P7.Trace("DMA (%d) is complete\n", szCount); 
 P7.Error("DMA (%d) error %s\n", szCount, pError); 
@@ -30,7 +32,7 @@ P7.Error("DMA (%d) error %s\n", szCount, pError);
  # Trace messages strings: UTF-8 (Linux) UTF-16 (Windows)
  # If connection with a server is not established or has been lost - all new traces/telemetry samples will be dropped. Thus your application will work without additional load.
  # Verbosity level can be set from server to reduce load
- # Telemetry counters are managed (on/off) from Baical server
+ # Telemetry counters are managed (on/off) through Baical server
  # The library works for 
    * Windows 32/64 bits (Visual Studio)
    * Linux 32/64 bits (G++)
