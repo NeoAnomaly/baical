@@ -13,7 +13,7 @@ A lot of water has flowed under the bridge since that time, HW and SW solutions 
 Currently I have some experience in this area and I would like to share it with other engineers in the hope that it will help to work more productive and release more stable products.
 
 = Why =
-Unfortunately all known by me similar systems are protected by copyright and used only internally, they are powerful, robust and nobody see them outside company. People trying to use SysLog (it is good for some administrative cases but useless when you need to get a power, speed and reliability) or develop their own solutions and use it internally.
+Unfortunately all known by me similar systems are protected by copyright and used only internally, they are powerful, robust and nobody see them outside company. 
 
 = Who =
 This project is dedicated to engineers who develop for embedded systems & controllers and would like to send trace & telemetry information from many devices over network and receive it on one dedicated PC.
