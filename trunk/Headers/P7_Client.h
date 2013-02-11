@@ -166,11 +166,11 @@ public:
 class /*__declspec(novtable)*/ IP7_Client
 {
 public:
-    virtual tINT32          Add_Ref()                                       = 0;
-    virtual tINT32          Release()                                       = 0;
+    virtual tINT32         Add_Ref()                                        = 0;
+    virtual tINT32         Release()                                        = 0;
 
-    virtual tBOOL           Get_Status(sP7C_Status *o_pStatus)              = 0;
-    virtual tBOOL           Get_Info(sP7C_Info *o_pInfo)                    = 0;
+    virtual tBOOL          Get_Status(sP7C_Status *o_pStatus)               = 0;
+    virtual tBOOL          Get_Info(sP7C_Info *o_pInfo)                     = 0;
     //N.B. If you use Baikal server to receive data - please do not mix
     //     different packets formats (Trace + Telemetry for example) on the same
     //     channel, in this case one data format will be dropped by server
@@ -191,7 +191,7 @@ public:
     //Return:
     // tBOOL - TRUE on success, FALSE - otherwise (system error or object with
     //         such name (i_pName) is already exists
-    virtual tBOOL Share(const tXCHAR *i_pName)                              = 0;
+    virtual tBOOL           Share(const tXCHAR *i_pName)                    = 0;
 
 
 };
