@@ -13,7 +13,7 @@ Changes list:
 =Angara v0.9.8=
 [http://baical.googlecode.com/files/Angara_v0.9.8.zip Download]  latest version.
 Changes list:
- + Added: Send internal logs to Baical server
+ * Added: Send internal logs to Baical server
  * Fixed: TMF parsing error
 
 -------------------
