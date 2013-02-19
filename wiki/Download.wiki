@@ -1,5 +1,25 @@
 #summary Download page
-=Baical v0.5=
+=Baical v0.5.2=
+[http://baical.googlecode.com/files/Baical_v0.5.2.zip Download] latest version.
+Changes list:
+ * Fixed: P7.Telemetry viewer. Memory leaks
+ * Fixed: P7.Telemetry storage. Lazy storage initialization fails
+
+=P7 Library v1.7.1=
+[http://code.google.com/p/baical/source/checkout Checkout] latest source code:
+Changes list:
+ * Fixed: counters description was not sent in some cases
+
+=Angara v0.9.8=
+[http://baical.googlecode.com/files/Angara_v0.9.8.zip Download]  latest version.
+Changes list:
+ + Added: Send internal logs to Baical server
+ * Fixed: TMF parsing error
+
+-------------------
+=Old versions=
+
+==Baical v0.5==
 [http://baical.googlecode.com/files/Baical_v0.5.zip Download] latest version.
 Changes list:
  * P7.Telemetry viewer: New renderer, processor, new functionality, error fixes
@@ -8,21 +28,14 @@ Changes list:
  * Auto-check for updates
  * P7.Server: optimization
 
-=Angara v0.9.8=
-[http://baical.googlecode.com/files/Angara_v0.9.8.zip Download]  latest version.
-Changes list:
- * Send internal logs to Baical server
- * TMF parsing error fix 
-
-=P7 Library v1.7=
+==P7 Library v1.7==
 [http://code.google.com/p/baical/source/checkout Checkout] latest source code:
 Changes list:
  * P7 objects (client, trace, telemetry) shared memory. You can create one instance on P7.Trace object for example and retreive pointer for it from any module of your application.
  * Add telemetry interface
  * Update example cource code - include telemetry example
 
--------------------
-=Old versions=
+
  * [http://baical.googlecode.com/files/Baical_v0.4.zip Baical v0.4]
  * [http://baical.googlecode.com/files/Baical_v0.3.4.zip Baical v0.3.4]
  * [http://baical.googlecode.com/files/Baical_v0.3.2.zip Baical v0.3.2]
