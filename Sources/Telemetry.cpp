@@ -81,8 +81,7 @@ CP7Tel_Counter::CP7Tel_Counter(tUINT8        i_bID,
                                tINT64        i_llAlarm,
                                const tXCHAR *i_pName
                               )
-    : m_dwResets(0xFFFFFFFF)
-    , m_bInitialized(TRUE)
+    : m_bInitialized(TRUE)
 {
     memset(&m_sCounter, 0, sizeof(sP7Tel_Counter));
 
@@ -163,38 +162,11 @@ tBOOL CP7Tel_Counter::Is_Initialized()
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Get                                       
-sP7Tel_Counter *CP7Tel_Counter::Get()
-{
-    return &m_sCounter;
-}// Get_Buffer                                       
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Set_Resets 
-void CP7Tel_Counter::Set_Resets(tUINT32 i_dwResets)
-{
-    m_dwResets = i_dwResets;
-}// Set_Resets                          
-
-
-////////////////////////////////////////////////////////////////////////////////
 // Enable 
 void CP7Tel_Counter::Enable(tUINT8 i_bOn)
 {
-    m_dwResets     = 0xFFFFFFFF;
     m_sCounter.bOn = i_bOn;
 }// Enable
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Get_Resets                                       
-tUINT32 CP7Tel_Counter::Get_Resets()
-{
-    return m_dwResets;
-}// Get_Resets                                       
-
 
 
 
@@ -205,7 +177,8 @@ CP7Telemetry::CP7Telemetry(IP7_Client *i_pClient, const tXCHAR *i_pName)
     , m_lReference(1)
     , m_dwChannel_ID(0)
     , m_bInitialized(TRUE)
-    , m_dwResets(0xFFFFFFFF)
+    , m_dwChannel_Resets(0xFFFFFFFF)
+    , m_dwCounters_Resets(0xFFFFFFFF)
     , m_pChunks(NULL)
     , m_dwChunks_Max_Count(0)
     , m_bIs_Channel(FALSE)
@@ -231,7 +204,7 @@ CP7Telemetry::CP7Telemetry(IP7_Client *i_pClient, const tXCHAR *i_pName)
      if (m_bInitialized)
      {
          memset(m_pCounters, 0, sizeof(m_pCounters));
-         m_bInitialized = Inc_Chunks(8);
+         m_bInitialized = Inc_Chunks(P7TELEMETRY_COUNTERS_MAX_COUNT + 8);
      }
 
      if (m_bInitialized)
@@ -470,7 +443,7 @@ tBOOL CP7Telemetry::Find(const tXCHAR *i_pName, tUINT8 *o_pID)
     {
         if ((*l_pCounter)->Is_Name(l_pName))
         {
-            sP7Tel_Counter *l_pCnt = (*l_pCounter)->Get();
+            sP7Tel_Counter *l_pCnt = &((*l_pCounter)->m_sCounter);
 
             if (l_pCnt)
             {
@@ -500,8 +473,6 @@ tBOOL CP7Telemetry::Add(tUINT8 i_bID, tINT64 i_llValue)
 
     //we do not initialize it here, we do it later
     sP7C_Data_Chunk *l_pChunk; 
-    CP7Tel_Counter  *l_pCounter;
-    sP7Tel_Counter  *l_pHeader;
 
     if (FALSE == m_bInitialized)
     {
@@ -519,48 +490,47 @@ tBOOL CP7Telemetry::Add(tUINT8 i_bID, tINT64 i_llValue)
 
 
     ////////////////////////////////////////////////////////////////////////////
-    //if user specify direct Trace ID
-    if (P7TELEMETRY_COUNTERS_MAX_COUNT <= i_bID)
+    //check ID
+    if (    (P7TELEMETRY_COUNTERS_MAX_COUNT <= i_bID)
+         || (NULL == m_pCounters[i_bID])
+       )
     {
         l_bReturn = FALSE;
         goto l_lblExit;
     }
 
-    l_pCounter = m_pCounters[i_bID];
-
-    if (NULL == l_pCounter)
-    {
-        l_bReturn = FALSE;
-        goto l_lblExit;
-    }
-
-    l_pHeader = l_pCounter->Get();
     l_pChunk  = m_pChunks;
 
     //connection was lost, we need to resend initial data 
-    if (m_dwResets != m_sStatus.dwResets)
+    if (m_dwChannel_Resets != m_sStatus.dwResets)
     {
-        m_dwResets = m_sStatus.dwResets;
+        m_dwChannel_Resets = m_sStatus.dwResets;
 
-        l_pChunk->dwSize = sizeof(m_sHeader_Info);
-        l_pChunk->pData  = &m_sHeader_Info;
-        l_dwSize        += l_pChunk->dwSize;
+        l_pChunk->dwSize   = sizeof(m_sHeader_Info);
+        l_pChunk->pData    = &m_sHeader_Info;
+        l_dwSize          += l_pChunk->dwSize;
         l_pChunk ++;
     }
 
-    //trace description have to send again
-    if (m_dwResets != l_pCounter->Get_Resets())
+    //counters descriptions have to send again
+    if (m_dwCounters_Resets != m_sStatus.dwResets)
     {
-        l_pCounter->Set_Resets(m_dwResets);
+        CP7Tel_Counter **l_pIter = m_pCounters;
 
-        l_bReset         = TRUE;
-        l_pChunk->pData  = l_pHeader;
-        l_pChunk->dwSize = l_pHeader->sCommon.dwSize;
-        l_dwSize        += l_pChunk->dwSize;
-        l_pChunk ++;
+        while (*l_pIter)
+        {
+            l_pChunk->pData  = &((*l_pIter)->m_sCounter);
+            l_pChunk->dwSize = (*l_pIter)->m_sCounter.sCommon.dwSize;
+            l_dwSize        += l_pChunk->dwSize;
+            l_pChunk ++;
+            l_pIter++;
+        }
+
+        m_dwCounters_Resets = m_sStatus.dwResets;
+        l_bReset            = TRUE;
     }
 
-    if (l_pHeader->bOn)
+    if (m_pCounters[i_bID]->m_sCounter.bOn)
     {
         m_sValue.bID     = i_bID;
         m_sValue.llValue = i_llValue;
@@ -590,7 +560,7 @@ tBOOL CP7Telemetry::Add(tUINT8 i_bID, tINT64 i_llValue)
         //we set marker that is should be redelivered next time
         if (l_bReset)
         {
-            l_pCounter->Set_Resets(m_dwResets - 1);
+            m_dwCounters_Resets -= 1;
         }
 
         l_bReturn = FALSE;

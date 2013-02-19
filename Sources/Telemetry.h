@@ -25,13 +25,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 class CP7Tel_Counter
 {
-    sP7Tel_Counter m_sCounter;
-    //count of connections drops... see sP7C_Status. If this value and 
-    //value from IP7_Client are different - it mean we loose connection
-    tUINT32        m_dwResets; 
-
+private:
     tBOOL          m_bInitialized;
+
 public:
+    sP7Tel_Counter m_sCounter;
+
     CP7Tel_Counter(tUINT8        i_bID,
                    tUINT8        i_bOn,
                    tINT64        i_llMin,
@@ -43,11 +42,7 @@ public:
 
     tBOOL           Is_Name(const tWCHAR *i_pName);
     tBOOL           Is_Initialized();
-    sP7Tel_Counter *Get();
-    void            Set_Resets(tUINT32 i_dwResets);
     void            Enable(tUINT8 i_bOn);
-    tUINT32         Get_Resets();
-
 };
 
 
@@ -70,7 +65,8 @@ class CP7Telemetry:
 
     CP7Tel_Counter         *m_pCounters[P7TELEMETRY_COUNTERS_MAX_COUNT];
 
-    tUINT32                 m_dwResets; 
+    tUINT32                 m_dwChannel_Resets; 
+    tUINT32                 m_dwCounters_Resets; 
     sP7C_Status             m_sStatus;
 
     sP7C_Data_Chunk        *m_pChunks;

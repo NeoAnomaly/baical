@@ -50,7 +50,7 @@ int main(int i_iArgC, char* i_pArgV[])
     }
 
     //register telemetry counter, it has values in range 0 ... 1023
-    if (FALSE == l_pTelemetry->Create(TM("Test counter"), 0, 1023, 1000, 1, &l_pTID))
+    if (FALSE == l_pTelemetry->Create(TM("Test counter 1"), 0, 1023, 1000, 1, &l_pTID))
     {
         goto l_lblExit;
     }
