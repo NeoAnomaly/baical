@@ -407,7 +407,8 @@ tBOOL CP7Telemetry::Create(const tXCHAR  *i_pName,
 
     if (l_bReturn)
     {
-        *o_pID = (tUINT8)m_dwLast_ID;
+        m_dwCounters_Resets = 0xFFFFFFFF;
+        *o_pID              = (tUINT8)m_dwLast_ID;
     }
 
     LOCK_EXIT(m_sCS);
