@@ -6,7 +6,7 @@ Changes list:
  * Fixed: P7.Telemetry storage. Lazy storage initialization fails
  * Fixed: P7.Telemetry viewer. Memory leaks
  * Fixed: P7.Telemetry viewer. Scrolling on release was wrong for real-time streams
-
+You may have to install [http://www.microsoft.com/en-us/download/details.aspx?id=5555 Visual C++ 2010 Redistributable]
 =P7 Library v1.7.1=
 [http://code.google.com/p/baical/source/checkout Checkout] latest source code:
 Changes list:
