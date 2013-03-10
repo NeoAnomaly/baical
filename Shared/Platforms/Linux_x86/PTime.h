@@ -25,7 +25,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //GetTickCount
-static tUINT32 GetTickCount()
+static __attribute__ ((unused)) tUINT32 GetTickCount()
 {
     tUINT64 l_qwReturn; //Warn:without initialization !
     //timeval l_sTime;
@@ -44,7 +44,7 @@ static tUINT32 GetTickCount()
 
 ////////////////////////////////////////////////////////////////////////////////
 //GetPerformanceCounter
-static tUINT64 GetPerformanceCounter()
+static __attribute__ ((unused)) tUINT64 GetPerformanceCounter()
 {
     tUINT64 l_qwReturn      = 0;
     struct timespec l_sTime = {0, 0};
@@ -65,7 +65,7 @@ static tUINT64 GetPerformanceCounter()
 
 ////////////////////////////////////////////////////////////////////////////////
 //GetPerformanceFrequency
-static tUINT64 GetPerformanceFrequency()
+static __attribute__ ((unused)) tUINT64 GetPerformanceFrequency()
 {
     return 10000000; //100 nano second
     //LARGE_INTEGER l_qwValue;
@@ -78,7 +78,7 @@ static tUINT64 GetPerformanceFrequency()
 ////////////////////////////////////////////////////////////////////////////////
 //GetEpochTime
 //return a 64-bit value of 100-nanosecond intervals since January 1, 1601 (UTC).
-static void GetEpochTime(tUINT32 *o_pHi, tUINT32 *o_pLow)
+static __attribute__ ((unused)) void GetEpochTime(tUINT32 *o_pHi, tUINT32 *o_pLow)
 {
     tUINT64        l_qwResult = 0;
     struct timeval l_sTime    = {0, 0};

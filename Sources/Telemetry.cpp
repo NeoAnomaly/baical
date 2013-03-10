@@ -173,8 +173,8 @@ void CP7Tel_Counter::Enable(tUINT8 i_bOn)
 ////////////////////////////////////////////////////////////////////////////////
 // CP7Telemetry                                       
 CP7Telemetry::CP7Telemetry(IP7_Client *i_pClient, const tXCHAR *i_pName)
-    : m_pClient(i_pClient)
-    , m_lReference(1)
+    : m_lReference(1)
+    , m_pClient(i_pClient)
     , m_dwChannel_ID(0)
     , m_bInitialized(TRUE)
     , m_dwChannel_Resets(0xFFFFFFFF)
@@ -338,6 +338,7 @@ void CP7Telemetry::On_Receive(tUINT32 i_dwChannel, tUINT8 *i_pBuffer, tUINT32 i_
             if (m_pCounters[l_pEnable->bID])
             {
                 m_pCounters[l_pEnable->bID]->Enable(l_pEnable->bOn);
+                //printf("Enable %d, %d\n", (int)l_pEnable->bID, (int)l_pEnable->bOn);
             }
         }
     }

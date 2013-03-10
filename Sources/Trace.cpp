@@ -139,8 +139,8 @@ CP7Trace_Desc::CP7Trace_Desc(tUINT16        i_wID,
                              const char    *i_pFunction,
                              const tXCHAR  *i_pFormat
                             )
-    : m_dwResets(0xFFFFFFFF)
-    , m_wID(i_wID)
+    : m_wID(i_wID)
+    , m_dwResets(0xFFFFFFFF)
     , m_dwSize(0)
     , m_pBuffer(NULL)
     , m_pArgs(NULL)
@@ -378,13 +378,13 @@ CP7Trace_Desc::CP7Trace_Desc(tUINT16        i_wID,
 
          if (i_pFile)
          {
-             l_dwFile_Size += strlen(i_pFile);
+             l_dwFile_Size += (tUINT32)strlen(i_pFile);
          }
          l_dwFile_Size ++; //last 0
 
          if (i_pFunction)
          {
-             l_dwFunc_Size += strlen(i_pFunction);
+             l_dwFunc_Size += (tUINT32)strlen(i_pFunction);
          }
          l_dwFunc_Size ++; //last 0
 
@@ -689,17 +689,17 @@ tBOOL CP7Trace_Desc::Add_Argument(tUINT8 i_bType, tUINT8 i_bSize)
 ////////////////////////////////////////////////////////////////////////////////
 // CP7Trace                                       
 CP7Trace::CP7Trace(IP7_Client *i_pClient, const tXCHAR *i_pName)
-    : m_pClient(i_pClient)
-    , m_lReference(1)
+    : m_lReference(1)
     , m_dwSequence(0)
+    , m_pClient(i_pClient)
     , m_dwChannel_ID(0)
+    , m_wDesc_Tree_ID(P7_TRACE_DESC_HARDCODED_COUNT)
     , m_dwLast_ID(0)
     , m_bInitialized(TRUE)
     , m_eVerbosity(EP7TRACE_LEVEL_TRACE)
     , m_dwResets(0xFFFFFFFF)
     , m_pChunks(NULL)
     , m_dwChunks_Max_Count(0)
-    , m_wDesc_Tree_ID(P7_TRACE_DESC_HARDCODED_COUNT)
     , m_bIs_Channel(FALSE)
     , m_pShared(NULL)
 {
@@ -1097,14 +1097,14 @@ __forceinline tBOOL CP7Trace::Trace_Raw(tUINT16        i_wTrace_ID,
         }
         else if (P7TRACE_ITEM_BLOCK_ASTRING == (*l_pBlocks))
         {
-            l_pChunk->dwSize = strlen(*(char**)l_pVArgs) + 1;
+            l_pChunk->dwSize = (tUINT32)strlen(*(char**)l_pVArgs) + 1;
             l_pChunk->pData  = *(char**)l_pVArgs;
             l_pVArgs        += sizeof(char*);
         }
 #ifndef UTF8_ENCODING
         else if (P7TRACE_ITEM_BLOCK_WSTRING == (*l_pBlocks))
         {
-            l_pChunk->dwSize = (wcslen(*(wchar_t**)l_pVArgs) + 1) * sizeof(wchar_t);
+            l_pChunk->dwSize = (tUINT32)((wcslen(*(wchar_t**)l_pVArgs) + 1) * sizeof(wchar_t));
             l_pChunk->pData  = *(wchar_t**)l_pVArgs;
             l_pVArgs        += sizeof(wchar_t*);
         }

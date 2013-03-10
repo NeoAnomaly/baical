@@ -71,38 +71,40 @@ IP7_Client * __stdcall P7_Get_Shared(const tXCHAR *i_pName)
 ////////////////////////////////////////////////////////////////////////////////
 //CClient
 CClient::CClient(tXCHAR *i_pArgs)
-    : m_bIs_Winsock(FALSE)
+    : m_lReference(1)
+
+    , m_lReject_Mem(0)
+    , m_lReject_Con(0)
+    , m_lReject_Int(0)
+
+    , m_bIs_Winsock(FALSE)
     , m_pSocket(NULL)
     , m_wClient_ID(0xFFFF)
     , m_pLog(NULL)
     , m_pBPool(NULL)
     , m_eStatus(ECLIENT_STATUS_OK)
-    , m_lReference(1)
-    , m_lReject_Mem(0)
-    , m_lReject_Con(0)
-    , m_lReject_Int(0)
 
-    , m_dwData_Wnd_Size(0)
+    , m_pData_Wnd(NULL)
+    , m_pData_Wnd_Cell(NULL)
     , m_dwData_Wnd_Max_Count(0)
+    , m_dwData_Wnd_Size(0)
+    , m_dwData_Wnd_TimeStamp(0)
     , m_dwData_Wnd_First_ID(TPACKET_MAX_ID + 1)
     , m_dwData_Wnd_Last_ID(TPACKET_MAX_ID + 1)
-    , m_dwData_Wnd_TimeStamp(0)
-    , m_pData_Wnd_Cell(NULL)
+    , m_bData_Resending(FALSE)
 
     , m_dwDelivery_Fails(0)
     , m_bIs_Response_Waiting(FALSE)
-    , m_bData_Resending(FALSE)
 
-    , m_pPacket_Control(NULL)
     , m_pData_Queue_Out(NULL)
-    , m_pData_Wnd(NULL)
-
     , m_pData_Queue_In(NULL)
 
     , m_dwLast_Packet_ID(0)
     , m_dwServiceTimeStamp(0)
     , m_bConnected(TRUE)
     , m_dwConnection_Resets(0)
+
+    , m_pPacket_Control(NULL)
 
     , m_bComm_Thread(FALSE)
     , m_hComm_Thread(0) //NULL
@@ -212,7 +214,7 @@ CClient::~CClient()
     {
         pAList_Cell l_pElement = NULL;
 
-        while (l_pElement = m_pData_Queue_Out->Get_First())
+        while ((l_pElement = m_pData_Queue_Out->Get_First()))
         {
             CTPacket *l_pPacket = m_pData_Queue_Out->Get_Data(l_pElement);
             m_pData_Queue_Out->Del(l_pElement, FALSE);
@@ -229,7 +231,7 @@ CClient::~CClient()
     {
         pAList_Cell l_pElement = NULL;
 
-        while (l_pElement = m_pData_Queue_In->Get_First())
+        while ((l_pElement = m_pData_Queue_In->Get_First()))
         {
             CTPacket *l_pPacket = m_pData_Queue_In->Get_Data(l_pElement);
             m_pData_Queue_In->Del(l_pElement, FALSE);
@@ -246,7 +248,7 @@ CClient::~CClient()
     {
         pAList_Cell l_pElement = NULL;
 
-        while (l_pElement = m_pData_Wnd->Get_First())
+        while ((l_pElement = m_pData_Wnd->Get_First()))
         {
             CTPacket *l_pPacket = m_pData_Wnd->Get_Data(l_pElement);
             m_pData_Wnd->Del(l_pElement, FALSE);
@@ -497,7 +499,7 @@ eClient_Status CClient::Init_Sockets(tXCHAR **i_pArg, int i_iCount)
 //Init_Pool
 eClient_Status CClient::Init_Pool(tXCHAR **i_pArg, int i_iCount)
 {
-    eClient_Status l_eReturn       = ECLIENT_STATUS_OK;
+    //eClient_Status l_eReturn       = ECLIENT_STATUS_OK;
     tXCHAR        *l_pArg_Value    = NULL;
     tUINT32        l_dwMax_Memory  = 0x100000; //1mb by default
     tUINT32        l_dwPacket_Size = TPACKET_MIN_SIZE;
@@ -1421,6 +1423,7 @@ void CClient::Chnl_Routine()
     pAList_Cell        l_pElement      = NULL;
     CTPacket          *l_pPacket       = NULL;
     tUINT8            *l_pBuffer       = NULL;
+    tUINT8            *l_pStop         = NULL;
     sH_User_Data      *l_pHeader       = NULL;
     IP7C_Channel      *l_pChannel      = NULL;
 
@@ -1443,33 +1446,41 @@ void CClient::Chnl_Routine()
                 l_pPacket = m_pData_Queue_In->Get_Data(l_pElement);
                 m_pData_Queue_In->Del(l_pElement, FALSE);
             }
+
             LOCK_EXIT(m_hCS_Data_In); 
 
             if (l_pPacket)
             {
-                l_pBuffer = l_pPacket->Get_Buffer();
-                l_pHeader = (sH_User_Data*)(l_pBuffer + ACKNOWLEDGMENT_SIZE);
+                l_pBuffer = l_pPacket->Get_Buffer() + ACKNOWLEDGMENT_SIZE;
+                l_pStop   = l_pPacket->Get_Buffer() + l_pPacket->Get_Size();
 
                 LOCK_ENTER(m_hCS_Channels);
 
-                if (USER_PACKET_CHANNEL_ID_MAX_SIZE > l_pHeader->dwChannel_ID)
+                while (l_pBuffer < l_pStop)
                 {
-                    l_pChannel = m_pChannels[l_pHeader->dwChannel_ID];
-                }
+                    l_pHeader  = (sH_User_Data*)(l_pBuffer);
 
-                if (l_pChannel)
-                {
-                    l_pChannel->On_Receive(l_pHeader->dwChannel_ID,
-                                           l_pBuffer + ACKNOWLEDGMENT_SIZE + sizeof(sH_User_Data), 
-                                           l_pHeader->dwSize - sizeof(sH_User_Data)
-                                          );
-                }
-                else
-                {
-                    JOURNAL_ERROR(m_pLog, 
-                                  TM("Channel %d is not registered!"), 
-                                  (tUINT32)l_pHeader->dwChannel_ID
-                                 );
+                    if (USER_PACKET_CHANNEL_ID_MAX_SIZE > l_pHeader->dwChannel_ID)
+                    {
+                        l_pChannel = m_pChannels[l_pHeader->dwChannel_ID];
+                    }
+
+                    if (l_pChannel)
+                    {
+                        l_pChannel->On_Receive(l_pHeader->dwChannel_ID,
+                                               l_pBuffer + sizeof(sH_User_Data), 
+                                               l_pHeader->dwSize - sizeof(sH_User_Data)
+                                              );
+                    }
+                    else
+                    {
+                        JOURNAL_ERROR(m_pLog, 
+                                      TM("Channel %d is not registered!"), 
+                                      (tUINT32)l_pHeader->dwChannel_ID
+                                     );
+                    }
+
+                    l_pBuffer += l_pHeader->dwSize;
                 }
 
                 LOCK_EXIT(m_hCS_Channels);

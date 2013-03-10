@@ -79,7 +79,7 @@ typedef addrinfo  tADDR_INFO;
 
 ////////////////////////////////////////////////////////////////////////////////
 //WSA_Init
-static tBOOL WSA_Init()
+static __attribute__ ((unused)) tBOOL WSA_Init()
 {
     return TRUE;
     
@@ -95,7 +95,7 @@ static tBOOL WSA_Init()
 
 ////////////////////////////////////////////////////////////////////////////////
 //WSA_UnInit
-static void WSA_UnInit()
+static __attribute__ ((unused)) void WSA_UnInit()
 {
     //WSACleanup();
 }//WSA_UnInit

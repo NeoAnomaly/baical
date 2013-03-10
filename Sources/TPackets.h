@@ -118,7 +118,7 @@ struct sH_Data_Window_Report
 // #define USER_PACKET_MAX_SIZE                  (1 << USER_PACKET_SIZE_BITS_COUNT)
 // #define USER_PACKET_CHANNEL_ID_MAX_SIZE (1 << USER_PACKET_CHANNEL_ID_BITS_COUNT)
 
-struct sH_User_Data //user header
+struct sH_User_Data //user data header
 {
     tUINT32 dwSize       :USER_PACKET_SIZE_BITS_COUNT; 
     tUINT32 dwChannel_ID :USER_PACKET_CHANNEL_ID_BITS_COUNT;
@@ -139,18 +139,17 @@ protected:
     tBOOL       m_bInitialized;
     tUINT32     m_dwPool_ID;
     tBOOL       m_bShell;
-protected:
     sH_Common  *m_pHeader;  //point to m_pBuffer    
 public:
     ////////////////////////////////////////////////////////////////////////////
     //CTPacket::CTPacket
-    CTPacket():
-        m_pBuffer(NULL)
-       ,m_dwBuffer_Size(0)
-       ,m_bInitialized(TRUE)
-       ,m_dwPool_ID(0)
-       ,m_bShell(TRUE)
-       ,m_pHeader(NULL)
+    CTPacket()
+       : m_pBuffer(NULL)
+       , m_dwBuffer_Size(0)
+       , m_bInitialized(TRUE)
+       , m_dwPool_ID(0)
+       , m_bShell(TRUE)
+       , m_pHeader(NULL)
     {
     }//CTPacket::CTPacket
 
@@ -160,13 +159,13 @@ public:
     CTPacket(tUINT8 *i_pBuffer,
              tUINT32 i_dwBuffer_Size,
              tUINT32 i_dwPool_ID
-            ):
-        m_pBuffer(i_pBuffer)
-       ,m_dwBuffer_Size(i_dwBuffer_Size)
-       ,m_bInitialized(TRUE)
-       ,m_dwPool_ID(i_dwPool_ID)
-       ,m_bShell(TRUE)
-       ,m_pHeader(NULL)
+            )
+       : m_pBuffer(i_pBuffer)
+       , m_dwBuffer_Size(i_dwBuffer_Size)
+       , m_bInitialized(TRUE)
+       , m_dwPool_ID(i_dwPool_ID)
+       , m_bShell(TRUE)
+       , m_pHeader(NULL)
     {
         if (m_pBuffer)
         {
@@ -183,13 +182,13 @@ public:
 
     ////////////////////////////////////////////////////////////////////////////
     //CTPacket::CTPacket
-    CTPacket(tUINT32 i_dwBuffer_Size, tUINT32 i_dwPool_ID):
-        m_pBuffer(NULL)  
-       ,m_dwBuffer_Size(0)
-       ,m_bInitialized(FALSE)
-       ,m_dwPool_ID(i_dwPool_ID)
-       ,m_pHeader(NULL)
-       ,m_bShell(FALSE)
+    CTPacket(tUINT32 i_dwBuffer_Size, tUINT32 i_dwPool_ID)
+       : m_pBuffer(NULL)  
+       , m_dwBuffer_Size(0)
+       , m_bInitialized(FALSE)
+       , m_dwPool_ID(i_dwPool_ID)
+       , m_bShell(FALSE)
+       , m_pHeader(NULL)
     {
         m_pBuffer = new tUINT8[i_dwBuffer_Size];
 
@@ -813,7 +812,7 @@ public:
     {
         if (m_bInitialized)
         {
-            m_pHeader->wSize = ACKNOWLEDGMENT_SIZE;
+            m_pHeader->wSize  = ACKNOWLEDGMENT_SIZE;
             m_pHeader->wType  = ETPT_ACKNOWLEDGMENT;
 
             m_pResponse = (sH_Packet_Ack*)(m_pBuffer + sizeof(sH_Common));
@@ -888,6 +887,7 @@ public:
              || (TRUE  == m_bShell)
              || (NULL  == i_pData)
              || (0     >= i_dwSize)
+             || ((m_dwBuffer_Size - ACKNOWLEDGMENT_SIZE ) < i_dwSize)
            )
         {
             return;

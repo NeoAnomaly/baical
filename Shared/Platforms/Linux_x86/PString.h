@@ -24,7 +24,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 //PStrLen
-static tUINT32 PStrLen(const tXCHAR *i_pText)
+static __attribute__ ((unused)) tUINT32 PStrLen(const tXCHAR *i_pText) 
 {
     return strlen(i_pText);
 }//PStrLen
@@ -32,7 +32,7 @@ static tUINT32 PStrLen(const tXCHAR *i_pText)
 
 ///////////////////////////////////////////////////////////////////////////////
 //PStrNCmp
-static tINT32 PStrNCmp(const tXCHAR *i_pS1, const tXCHAR *i_pS2, tUINT32 i_dwLen)
+static __attribute__ ((unused)) tINT32 PStrNCmp(const tXCHAR *i_pS1, const tXCHAR *i_pS2, tUINT32 i_dwLen)
 {
     return strncmp(i_pS1, i_pS2, i_dwLen);
 }//PStrNCmp
@@ -40,7 +40,7 @@ static tINT32 PStrNCmp(const tXCHAR *i_pS1, const tXCHAR *i_pS2, tUINT32 i_dwLen
 
 ///////////////////////////////////////////////////////////////////////////////
 //PStrToInt
-static tINT32 PStrToInt(const tXCHAR *i_pS1)
+static __attribute__ ((unused)) tINT32 PStrToInt(const tXCHAR *i_pS1)
 {
     return atoi(i_pS1);
 }//PStrToInt
@@ -48,7 +48,7 @@ static tINT32 PStrToInt(const tXCHAR *i_pS1)
 
 ///////////////////////////////////////////////////////////////////////////////
 //PUStrLen
-static tUINT32 PUStrLen(const tXCHAR *i_pText)
+static __attribute__ ((unused)) tUINT32 PUStrLen(const tXCHAR *i_pText)
 {
     return Get_UTF8_Length(i_pText);
 }//PUStrLen
@@ -57,7 +57,7 @@ static tUINT32 PUStrLen(const tXCHAR *i_pText)
 
 ///////////////////////////////////////////////////////////////////////////////
 //PStrCpy
-static void PUStrCpy(tWCHAR *i_pDst, tUINT32 i_dwMax_Len, const tXCHAR *i_pSrc)
+static __attribute__ ((unused)) void PUStrCpy(tWCHAR *i_pDst, tUINT32 i_dwMax_Len, const tXCHAR *i_pSrc)
 {
     Convert_UTF8_To_UTF16(i_pSrc, i_pDst, i_dwMax_Len);
     //wcscpy_s(i_pDst, i_dwMax_Len, i_pSrc);

@@ -96,7 +96,6 @@ class CClient:
     CThShell::tTHREAD    m_hChnl_Thread;
 
     hShared             *m_pShared;
-
 public:
     CClient(tXCHAR *i_pArgs);
     ~CClient();
