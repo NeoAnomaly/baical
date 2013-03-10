@@ -472,7 +472,7 @@ public:
             }
         }
 
-        if (strlen(l_pName) >= i_iMax_Len)
+        if (strlen(l_pName) >= (tUINT32)i_iMax_Len)
         {
             //not enough space in target buffer
             goto l_lblExit;

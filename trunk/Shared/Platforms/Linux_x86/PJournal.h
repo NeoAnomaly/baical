@@ -46,9 +46,9 @@ class CJournal
 public:
     ////////////////////////////////////////////////////////////////////////////
     CJournal()
-        : m_qwCount(0)
+        : m_iRCnt(1)
+        , m_qwCount(0)
         , m_eVerbosity(EFJOIRNAL_TYPE_WARNING)
-        , m_iRCnt(1)
         , m_pLength(8192)
     {
         LOCK_CREATE(m_hCS);

@@ -46,10 +46,10 @@ class CMEvent
     sem_t            m_sSem;
 #endif    
     
-    sEvent          *m_pEvents;
     tUINT8           m_bCount;
     tBOOL            m_bInit;
     tBOOL            m_bError;
+    sEvent          *m_pEvents;
     sEvent          *m_pEvent_Cur; 
     tINT32           m_iSignals;
 public:
@@ -97,7 +97,6 @@ public:
         tBOOL              l_bCA    = FALSE;
         tBOOL              l_bSig   = FALSE;
         tBOOL              l_bMutex = FALSE;
-        clockid_t          l_iClock = CLOCK_REALTIME;
         pthread_condattr_t l_sCA;
         
 
@@ -113,6 +112,8 @@ public:
 #ifdef PMEVENT_COND_VARIABLE    
         ////////////////////////////////////////////////////////////////////////
         //initialize Cond.Variable
+        clockid_t l_iClock = CLOCK_REALTIME;
+
         if (0 != pthread_condattr_init(&l_sCA))
         {
             goto l_lExit; //error
@@ -258,7 +259,7 @@ public:
 #ifdef PMEVENT_COND_VARIABLE    
         pthread_cond_signal(&m_sCV);
 #else
-        int l_iRet = sem_post(&m_sSem);
+        sem_post(&m_sSem);
 #endif                
         
         pthread_mutex_unlock(&m_sMutex);
@@ -341,9 +342,7 @@ public:
     //Wait
     tUINT32 Wait(tUINT32 i_dwMSec)
     {
-        tBOOL           l_bExit    = FALSE;
         tUINT64         l_qwNano   = (tUINT64)i_dwMSec * 1000000ULL;
-        int             l_iRes  = 0;
         tUINT32         l_dwReturn = MEVENT_TIME_OUT;
         struct timespec l_sTime    = {0, 0};
         
@@ -351,6 +350,7 @@ public:
         //LOCK
 
 #ifdef PMEVENT_COND_VARIABLE    
+        int l_iRes  = 0;
         pthread_mutex_lock(&m_sMutex);
         clock_gettime(CLOCK_MONOTONIC, &l_sTime);
         

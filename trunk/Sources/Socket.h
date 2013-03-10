@@ -49,10 +49,10 @@ class CUDP_Socket
 {
 private:
     tSOCKET           m_hSocket;
-    sockaddr_storage  m_tAddress;
-    tUINT32           m_dwAddress_Size;
     IJournal         *m_pLog;
     tBOOL             m_bServer;
+    sockaddr_storage  m_tAddress;
+    tUINT32           m_dwAddress_Size;
     tINT32            m_iFamily;
 public:
     ////////////////////////////////////////////////////////////////////////////
@@ -67,7 +67,6 @@ public:
         , m_iFamily(AF_UNSPEC)
     {
         eSocket_Status l_eStatus   = UDP_SOCKET_OK;
-        tUINT16        l_wPort     = 0;
 
         if (m_pLog)
         {
@@ -90,13 +89,11 @@ public:
             {
                 m_dwAddress_Size = sizeof(sockaddr_in);
                 memcpy(&m_tAddress, i_pAddress, m_dwAddress_Size);
-                l_wPort = ((sockaddr_in*)i_pAddress)->sin_port;
             }
             else if (AF_INET6 == i_pAddress->sa_family)
             {
                 m_dwAddress_Size = sizeof(sockaddr_in6);
                 memcpy(&m_tAddress, i_pAddress, m_dwAddress_Size);
-                l_wPort = ((sockaddr_in6*)i_pAddress)->sin6_port;
             }
             else
             {
@@ -129,7 +126,7 @@ public:
         {
             if (m_bServer)
             {
-                tINT32 l_iValue = 1;
+                //tINT32 l_iValue = 1;
                 //setsockopt(m_hSocket, 
                 //           SOL_SOCKET, 
                 //           SO_EXCLUSIVEADDRUSE,

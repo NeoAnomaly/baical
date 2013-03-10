@@ -57,8 +57,9 @@ class CP7Telemetry:
     IP7_Client             *m_pClient; 
     tUINT32                 m_dwChannel_ID;
 
-    tLOCK                   m_sCS; 
     tBOOL                   m_bInitialized;
+
+    tLOCK                   m_sCS; 
 
     sP7Tel_Info             m_sHeader_Info;
     sP7Tel_Value            m_sValue;

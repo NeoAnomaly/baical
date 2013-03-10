@@ -91,7 +91,7 @@ static hShared *Shared_Create(const tXCHAR *i_pName,
 
     memset(l_pReturn, 0, sizeof(hShared));
 
-    l_dwLen = wcslen(i_pName) + 128;
+    l_dwLen = (DWORD)wcslen(i_pName) + 128;
     l_pName = new wchar_t[l_dwLen];
 
     if (NULL == l_pName)
@@ -221,7 +221,7 @@ static tBOOL Shared_Read(const tXCHAR  *i_pName,
 
     memset(l_pShared, 0, sizeof(hShared));
 
-    l_dwLen = wcslen(i_pName) + 128;
+    l_dwLen = (DWORD)wcslen(i_pName) + 128;
     l_pName = new wchar_t[l_dwLen];
 
     if (NULL == l_pName)
