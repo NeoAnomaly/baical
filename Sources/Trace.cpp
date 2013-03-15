@@ -28,6 +28,10 @@
 #include "P7_Extensions.h"
 #include "Trace.h"
 
+#define RESET_UNDEFINED                                           (0xFFFFFFFFUL)
+#define RESET_FLAG_CHANNEL                                        (0x1)
+#define RESET_FLAG_TRACE                                          (0x2)
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //P7_Create_Client
@@ -140,7 +144,7 @@ CP7Trace_Desc::CP7Trace_Desc(tUINT16        i_wID,
                              const tXCHAR  *i_pFormat
                             )
     : m_wID(i_wID)
-    , m_dwResets(0xFFFFFFFF)
+    , m_dwResets(RESET_UNDEFINED)
     , m_dwSize(0)
     , m_pBuffer(NULL)
     , m_pArgs(NULL)
@@ -697,7 +701,7 @@ CP7Trace::CP7Trace(IP7_Client *i_pClient, const tXCHAR *i_pName)
     , m_dwLast_ID(0)
     , m_bInitialized(TRUE)
     , m_eVerbosity(EP7TRACE_LEVEL_TRACE)
-    , m_dwResets(0xFFFFFFFF)
+    , m_dwResets(RESET_UNDEFINED)
     , m_pChunks(NULL)
     , m_dwChunks_Max_Count(0)
     , m_bIs_Channel(FALSE)
@@ -775,14 +779,17 @@ CP7Trace::~CP7Trace()
         //sending data
         if (m_bInitialized)
         {
-            sP7Ext_Header   l_sHeader = { EP7USER_TYPE_TRACE, 
-                                          EP7TRACE_TYPE_CLOSE,
-                                          sizeof(sP7Ext_Header)
-                                        };
+            if (RESET_UNDEFINED != m_dwResets)
+            {
+                sP7Ext_Header   l_sHeader = { EP7USER_TYPE_TRACE, 
+                                              EP7TRACE_TYPE_CLOSE,
+                                              sizeof(sP7Ext_Header)
+                                            };
 
-            sP7C_Data_Chunk l_sChunk = {&l_sHeader, l_sHeader.dwSize};
+                sP7C_Data_Chunk l_sChunk = {&l_sHeader, l_sHeader.dwSize};
 
-            m_pClient->Sent(m_dwChannel_ID, &l_sChunk, 1, l_sChunk.dwSize);
+                m_pClient->Sent(m_dwChannel_ID, &l_sChunk, 1, l_sChunk.dwSize);
+            }
         }
 
         m_pClient->Unregister_Channel(m_dwChannel_ID);    
@@ -953,7 +960,7 @@ __forceinline tBOOL CP7Trace::Trace_Raw(tUINT16        i_wTrace_ID,
     tINT32          *l_pBlocks  = NULL;
     tUINT32          l_dwBCount = 0;
     tUINT8          *l_pVArgs   = (tUINT8*)(i_ppFormat) + sizeof(tXCHAR*);
-    tBOOL            l_bDrops   = FALSE;
+    tUINT8           l_bDrops   = 0;
     sP7C_Data_Chunk *l_pChunk; //we do not initialize it here, we do it later
 
     if (FALSE == m_bInitialized)
@@ -1053,11 +1060,12 @@ __forceinline tBOOL CP7Trace::Trace_Raw(tUINT16        i_wTrace_ID,
     //connection was lost, we need to resend initial data 
     if (m_dwResets != m_sStatus.dwResets)
     {
-        m_dwResets = m_sStatus.dwResets;
-
+        m_dwResets       = m_sStatus.dwResets;
+        l_bDrops        |= RESET_FLAG_CHANNEL;
         l_pChunk->dwSize = sizeof(m_sHeader_Info);
         l_pChunk->pData  = &m_sHeader_Info;
         l_dwSize        += l_pChunk->dwSize;
+
         l_pChunk ++;
     }
 
@@ -1066,7 +1074,7 @@ __forceinline tBOOL CP7Trace::Trace_Raw(tUINT16        i_wTrace_ID,
     {
         l_pDesc->Set_Resets(m_dwResets);
 
-        l_bDrops        = TRUE;
+        l_bDrops       |= RESET_FLAG_TRACE;
         l_pChunk->pData = l_pDesc->Get_Buffer(&l_pChunk->dwSize);
         l_dwSize       += l_pChunk->dwSize;
         l_pChunk ++;
@@ -1127,9 +1135,14 @@ __forceinline tBOOL CP7Trace::Trace_Raw(tUINT16        i_wTrace_ID,
     {
         //if delivery was failed and we try to deliver also trace description
         //we set marker that is should be redelivered next time
-        if (l_bDrops)
+        if (l_bDrops & RESET_FLAG_TRACE)
         {
-            l_pDesc->Set_Resets(m_dwResets - 1);
+            l_pDesc->Set_Resets(RESET_UNDEFINED);
+        }
+
+        if (l_bDrops & RESET_FLAG_CHANNEL)
+        {
+            m_dwResets = RESET_UNDEFINED;
         }
 
         l_bReturn = FALSE;

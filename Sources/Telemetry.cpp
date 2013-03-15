@@ -23,6 +23,10 @@
 #include "Telemetry.h"
 
 
+#define RESET_UNDEFINED                                           (0xFFFFFFFFUL)
+#define RESET_FLAG_CHANNEL                                        (0x1)
+#define RESET_FLAG_COUNTER                                        (0x2)
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //P7_Create_Telemetry
@@ -177,8 +181,8 @@ CP7Telemetry::CP7Telemetry(IP7_Client *i_pClient, const tXCHAR *i_pName)
     , m_pClient(i_pClient)
     , m_dwChannel_ID(0)
     , m_bInitialized(TRUE)
-    , m_dwChannel_Resets(0xFFFFFFFF)
-    , m_dwCounters_Resets(0xFFFFFFFF)
+    , m_dwResets_Channel(RESET_UNDEFINED)
+    , m_dwResets_Counters(RESET_UNDEFINED)
     , m_pChunks(NULL)
     , m_dwChunks_Max_Count(0)
     , m_bIs_Channel(FALSE)
@@ -258,14 +262,17 @@ CP7Telemetry::~CP7Telemetry()
         //sending data
         if (m_bInitialized)
         {
-            sP7Ext_Header   l_sHeader = { EP7USER_TYPE_TELEMETRY, 
-                                          EP7TEL_TYPE_CLOSE,
-                                          sizeof(sP7Ext_Header)
-                                        };
+            if (RESET_UNDEFINED != m_dwResets_Counters)
+            {
+                sP7Ext_Header   l_sHeader = { EP7USER_TYPE_TELEMETRY, 
+                                              EP7TEL_TYPE_CLOSE,
+                                              sizeof(sP7Ext_Header)
+                                            };
 
-            sP7C_Data_Chunk l_sChunk = {&l_sHeader, l_sHeader.dwSize};
+                sP7C_Data_Chunk l_sChunk = {&l_sHeader, l_sHeader.dwSize};
 
-            m_pClient->Sent(m_dwChannel_ID, &l_sChunk, 1, l_sChunk.dwSize);
+                m_pClient->Sent(m_dwChannel_ID, &l_sChunk, 1, l_sChunk.dwSize);
+            }
         }
 
         m_pClient->Unregister_Channel(m_dwChannel_ID);    
@@ -408,7 +415,7 @@ tBOOL CP7Telemetry::Create(const tXCHAR  *i_pName,
 
     if (l_bReturn)
     {
-        m_dwCounters_Resets = 0xFFFFFFFF;
+        m_dwResets_Counters = RESET_UNDEFINED;
         *o_pID              = (tUINT8)m_dwLast_ID;
     }
 
@@ -471,7 +478,7 @@ tBOOL CP7Telemetry::Add(tUINT8 i_bID, tINT64 i_llValue)
 {
     tBOOL            l_bReturn  = TRUE;
     tUINT32          l_dwSize   = 0;
-    tBOOL            l_bReset   = FALSE;
+    tUINT8           l_bReset   = 0;
 
     //we do not initialize it here, we do it later
     sP7C_Data_Chunk *l_pChunk; 
@@ -504,10 +511,11 @@ tBOOL CP7Telemetry::Add(tUINT8 i_bID, tINT64 i_llValue)
     l_pChunk  = m_pChunks;
 
     //connection was lost, we need to resend initial data 
-    if (m_dwChannel_Resets != m_sStatus.dwResets)
+    if (m_dwResets_Channel != m_sStatus.dwResets)
     {
-        m_dwChannel_Resets = m_sStatus.dwResets;
+        m_dwResets_Channel = m_sStatus.dwResets;
 
+        l_bReset          |= RESET_FLAG_CHANNEL;
         l_pChunk->dwSize   = sizeof(m_sHeader_Info);
         l_pChunk->pData    = &m_sHeader_Info;
         l_dwSize          += l_pChunk->dwSize;
@@ -515,7 +523,7 @@ tBOOL CP7Telemetry::Add(tUINT8 i_bID, tINT64 i_llValue)
     }
 
     //counters descriptions have to send again
-    if (m_dwCounters_Resets != m_sStatus.dwResets)
+    if (m_dwResets_Counters != m_sStatus.dwResets)
     {
         CP7Tel_Counter **l_pIter = m_pCounters;
 
@@ -528,8 +536,8 @@ tBOOL CP7Telemetry::Add(tUINT8 i_bID, tINT64 i_llValue)
             l_pIter++;
         }
 
-        m_dwCounters_Resets = m_sStatus.dwResets;
-        l_bReset            = TRUE;
+        m_dwResets_Counters = m_sStatus.dwResets;
+        l_bReset          |= RESET_FLAG_COUNTER;
     }
 
     if (m_pCounters[i_bID]->m_sCounter.bOn)
@@ -560,9 +568,13 @@ tBOOL CP7Telemetry::Add(tUINT8 i_bID, tINT64 i_llValue)
     {
         //if delivery was failed and we try to deliver also trace description
         //we set marker that is should be redelivered next time
-        if (l_bReset)
+        if (l_bReset & RESET_FLAG_CHANNEL)
         {
-            m_dwCounters_Resets -= 1;
+            m_dwResets_Channel = RESET_UNDEFINED;
+        }
+        if (l_bReset & RESET_FLAG_COUNTER)
+        {
+            m_dwResets_Counters = RESET_UNDEFINED;
         }
 
         l_bReturn = FALSE;

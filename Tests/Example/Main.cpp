@@ -16,6 +16,7 @@
 //******************************************************************************
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "PTypes.h"
 #include "GTypes.h"
@@ -31,8 +32,9 @@ int main(int i_iArgC, char* i_pArgV[])
     IP7_Trace     *l_pTrace_1   = NULL;
     IP7_Trace     *l_pTrace_2   = NULL;
     tUINT32        l_dwIdx      = 0;
-    IP7_Telemetry *l_pTelemetry = NULL;
-    tUINT8         l_pTID       = 0;
+    IP7_Telemetry *l_pTel       = NULL;
+    tUINT8         l_pTID[64]   = {0};
+    const wchar_t *l_pGroups[4] = {L"Group A", L"Group B", L"Group C", L"Group D"};
 
     //create P7 client object
     l_pClient = P7_Create_Client(0);
@@ -43,15 +45,45 @@ int main(int i_iArgC, char* i_pArgV[])
     }
 
     //create P7 telemetry object
-    l_pTelemetry = P7_Create_Telemetry(l_pClient, TM("Telemetry channel 1"));
-    if (NULL == l_pTelemetry)
+    l_pTel = P7_Create_Telemetry(l_pClient, TM("Telemetry channel 1"));
+    if (NULL == l_pTel)
     {
         goto l_lblExit;
     }
 
-    //register telemetry counter, it has values in range 0 ... 1023
-    if (FALSE == l_pTelemetry->Create(TM("Test counter 1"), 0, 1023, 1000, 1, &l_pTID))
-    {
+
+    if (FALSE == l_pTel->Create(TM("Threads/Thread 1"), 0, 6, 7, 0, &l_pTID[0]))
+    {                                                                            
+        goto l_lblExit;
+    }
+
+    if (FALSE == l_pTel->Create(TM("Threads/Thread 2"), 0, 6, 7, 0, &l_pTID[1]))
+    {                                                                            
+        goto l_lblExit;
+    }
+
+    if (FALSE == l_pTel->Create(TM("Threads/Thread 3"), 0, 6, 7, 0, &l_pTID[2]))
+    {                                                                            
+        goto l_lblExit;
+    }
+
+    if (FALSE == l_pTel->Create(TM("Buffers/Video"), 0, 6, 7, 0, &l_pTID[3]))
+    {                                                                            
+        goto l_lblExit;
+    }
+
+    if (FALSE == l_pTel->Create(TM("Buffers/Audio"), 0, 6, 7, 0, &l_pTID[4]))
+    {                                                                            
+        goto l_lblExit;
+    }
+
+    if (FALSE == l_pTel->Create(TM("Sensors/T1"), 0, 1, 2, 0, &l_pTID[5]))
+    {                                                                            
+        goto l_lblExit;
+    }
+
+    if (FALSE == l_pTel->Create(TM("Sensors/T2"), 0, 1, 2, 0, &l_pTID[6]))
+    {                                                                            
         goto l_lblExit;
     }
 
@@ -69,26 +101,43 @@ int main(int i_iArgC, char* i_pArgV[])
         goto l_lblExit;
     }
 
-    //send few trace messages
-    l_pTrace_1->P7_TRACE(0, TM("Test trace message #%d"), l_dwIdx ++);
-    l_pTrace_1->P7_INFO(0, TM("Test info message #%d"), l_dwIdx ++);
-    l_pTrace_1->P7_DEBUG(0, TM("Test debug message #%d"), l_dwIdx ++);
-    l_pTrace_1->P7_WARNING(0, TM("Test warning message #%d"), l_dwIdx ++);
-    l_pTrace_1->P7_ERROR(0, TM("Test error message #%d"), l_dwIdx ++);
-    l_pTrace_1->P7_CRITICAL(0, TM("Test critical message #%d"), l_dwIdx ++);
-    
-    l_pTrace_2->P7_QTRACE(1, 0, TM("Test quick trace on channel %d"), 2);
 
-    //send 1 million telemetry samples
-    for (tUINT64 l_qwI = 0ULL; l_qwI < 1000000ULL; l_qwI ++)
+    while (1)
     {
-        l_pTelemetry->Add(l_pTID, (l_qwI & 0x3FF));
+        //send few trace messages
+        l_pTrace_1->P7_TRACE(0, TM("Test trace message #%d"), l_dwIdx ++);
+        l_pTrace_1->P7_INFO(0, TM("Test info message #%d"), l_dwIdx ++);
+        l_pTrace_1->P7_DEBUG(0, TM("Test debug message #%d"), l_dwIdx ++);
+        l_pTrace_1->P7_WARNING(0, TM("Test warning message #%d"), l_dwIdx ++);
+        l_pTrace_1->P7_ERROR(0, TM("Test error message #%d"), l_dwIdx ++);
+        l_pTrace_1->P7_CRITICAL(0, TM("Test critical message #%d"), l_dwIdx ++);
+    
+        l_pTrace_2->P7_QTRACE(1, 0, TM("Test quick trace on channel %d"), 2);
+        Sleep(100);
+
     }
+
+//     for (tUINT64 l_qwI = 0ULL; l_qwI < 1000000000ULL; l_qwI ++)
+//     {
+//         if (l_qwI & 1)
+//         {
+//             l_pTel->Add(l_pTID[0], 6);
+//             l_pTel->Add(l_pTID[0], 0);
+//         }
+//         else
+//         {
+//             l_pTel->Add(l_pTID[0], 0);
+//             l_pTel->Add(l_pTID[0], 6);
+//         }
+// 
+//         Sleep(10);
+//     }
+
 l_lblExit:
-    if (l_pTelemetry)
+    if (l_pTel)
     {
-        l_pTelemetry->Release();
-        l_pTelemetry = NULL;
+        l_pTel->Release();
+        l_pTel = NULL;
     }
 
     if (l_pTrace_1)
