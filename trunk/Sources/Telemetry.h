@@ -66,8 +66,8 @@ class CP7Telemetry:
 
     CP7Tel_Counter         *m_pCounters[P7TELEMETRY_COUNTERS_MAX_COUNT];
 
-    tUINT32                 m_dwChannel_Resets; 
-    tUINT32                 m_dwCounters_Resets; 
+    tUINT32                 m_dwResets_Channel; 
+    tUINT32                 m_dwResets_Counters; 
     sP7C_Status             m_sStatus;
 
     sP7C_Data_Chunk        *m_pChunks;
