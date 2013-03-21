@@ -499,7 +499,7 @@ tBOOL Create(const tXCHAR  *i_pName,
 }}}
 
 _Arguments_:<br/>
- * i_pName {in} - Telemetry counter *unique* (case sensitive) for current session name. UTF-16 or UTF-8 (depending on OS) string.
+ * i_pName {in} - Telemetry counter name (case sensitive), should be *unique* for current session. UTF-16 or UTF-8 (depending on OS) string.
  * i_llMin {in} - min value of counter.
  * i_llMax {in} - max value of counter
  * i_llAlarm {in} - warning counter value, value should be in range i_llMin .. i_llMax.
@@ -508,7 +508,7 @@ _Arguments_:<br/>
 
 _Return_:<br/>
   * TRUE - counter was added successfully
-  * FALSE - fail, name is not unique or all 32 counters clots are busy
+  * FALSE - fail, name is not unique or all 256 counters slots are busy
 
 ==5.5 Add()==
 _Description_: Add sample value to the counter<br/>
@@ -539,7 +539,7 @@ tBOOL Find(const tXCHAR *i_pName,
 }}}
 
 _Arguments_:<br/>
- * i_pName {in} - Telemetry counter name. UTF-16 or UTF-8 (depending on OS) string. 
+ * i_pName {in} - Telemetry counter name (case sensitive). UTF-16 or UTF-8 (depending on OS) string. 
  * o_pID {out} - ID of the counter. 
 
 _Return_:<br/>
