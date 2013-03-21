@@ -499,7 +499,7 @@ tBOOL Create(const tXCHAR  *i_pName,
 }}}
 
 _Arguments_:<br/>
- * i_pName {in} - Telemetry counter name. UTF-16 or UTF-8 (depending on OS) string. 
+ * i_pName {in} - Telemetry counter *unique* (case sensitive) for current session name. UTF-16 or UTF-8 (depending on OS) string.
  * i_llMin {in} - min value of counter.
  * i_llMax {in} - max value of counter
  * i_llAlarm {in} - warning counter value, value should be in range i_llMin .. i_llMax.
