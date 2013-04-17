@@ -22,7 +22,8 @@ Changes list:
  * Added: P7.Telemetry viewer. Disable/enable, Show/Hide counters by groups
  * Fixed: P7.Trace viewer. Change short cuts for columns
  * Fixed: P7.Trace viewer. Show empty items in trace table after filtering
- * Fixed: P7.Trace viewer. Optimize filtering and searching by predicate (> 3x  * Fixed: P7.Telemetry viewer. Renderer initialization problem
+ * Fixed: P7.Trace viewer. Optimize filtering and searching by predicate (> 3x faster for predicates without text searching) 
+ * Fixed: P7.Telemetry viewer. Renderer initialization problem
  * Fixed: P7.Telemetry viewer. Display enumeration error for full screen window
  * Fixed: P7.Telemetry viewer. Reworked points calculation: min, max, average values are calculated at the same time
  * Fixed: P7.Telemetry viewer. Rework saving and restoring counters parameters, saving by names
