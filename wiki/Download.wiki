@@ -2,9 +2,6 @@
 =Baical v0.5.2=
 [http://baical.googlecode.com/files/Baical_v0.6.5.zip Download] latest version.
 Changes list:
- * Added: P7.Telemetry viewer. Saving & restoring scale
- * Added: P7.Telemetry viewer. Saving & restoring maximized window state
- * Added: P7.Telemetry viewer. 3 new types of graphs: curve, curve + range, cyclogram
  * Added: P7.Trace viewer. Adding additional columns (file, function, line)
  * Added: P7.Trace viewer. Ability to show/hide trace description
  * Added: P7.Trace viewer. Alt+O emulate pressing Ok on match expr. window
@@ -12,6 +9,9 @@ Changes list:
  * Added: P7.Trace viewer. New match expr. variables: File, Func, Line
  * Added: P7.Trace viewer. Filtering for Off-line strams
  * Added: P7.Trace viewer. Quick text search dialog in addition to match expr.
+ * Added: P7.Telemetry viewer. Saving & restoring scale
+ * Added: P7.Telemetry viewer. Saving & restoring maximized window state
+ * Added: P7.Telemetry viewer. 3 new types of graphs: curve, curve + range, cyclogram
  * Added: P7.Telemetry viewer. Counter min/max management, user can change it.
  * Added: P7.Telemetry viewer. FPS management, user can change max FPS value
  * Added: P7.Telemetry viewer. Display current FPS value and drawing time per frame
@@ -20,20 +20,17 @@ Changes list:
  * Added: P7.Telemetry viewer. User can sort counters by any column
  * Added: P7.Telemetry viewer. Save & Restore window parameters, column width, sort option, etc
  * Added: P7.Telemetry viewer. Disable/enable, Show/Hide counters by groups
-
- * Fixed: P7.Telemetry viewer. Renderer initialization problem
+ * Fixed: P7.Trace viewer. Change short cuts for columns
+ * Fixed: P7.Trace viewer. Show empty items in trace table after filtering
+ * Fixed: P7.Trace viewer. Optimize filtering and searching by predicate (> 3x  * Fixed: P7.Telemetry viewer. Renderer initialization problem
  * Fixed: P7.Telemetry viewer. Display enumeration error for full screen window
  * Fixed: P7.Telemetry viewer. Reworked points calculation: min, max, average values are calculated at the same time
  * Fixed: P7.Telemetry viewer. Rework saving and restoring counters parameters, saving by names
-
- * Fixed: P7.Trace viewer. Change short cuts for columns
- * Fixed: P7.Trace viewer. Optimize filtering and searching by predicate (> 3x faster) if predicate doesn't contains searching by text
-
+faster) if predicate doesn't contains searching by text
  * Fixed: P7.Telemetry viewer. D2D resource leak was fixed
  * Fixed: P7.Telemetry viewer. Points allocation speed up
  * Fixed: P7.Telemetry viewer. Antialiasing was switched off to gain D2D drawing performance
  * Fixed: P7. Extra packet management, ability to serialize multiple extra packets
- * Fixed: P7.Trace viewer. Show empty items in trace table after filtering
 You may have to install in addition [http://www.microsoft.com/en-us/download/details.aspx?id=5555 Visual C++ 2010 Redistributable]
 =P7 Library v1.7.3=
 [http://code.google.com/p/baical/source/checkout Checkout] latest source code:
