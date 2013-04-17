@@ -115,8 +115,8 @@ CP7Tel_Counter::~CP7Tel_Counter()
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Is_Name                                       
-tBOOL CP7Tel_Counter::Is_Name(const tWCHAR *i_pName)
+// Has_Name                                       
+tBOOL CP7Tel_Counter::Has_Name(const tWCHAR *i_pName)
 {
     tBOOL   l_bResult = TRUE;
     tWCHAR *l_pName   = m_sCounter.pName;
@@ -154,7 +154,7 @@ tBOOL CP7Tel_Counter::Is_Name(const tWCHAR *i_pName)
     }
 
     return l_bResult;
-}// Is_Name
+}// Has_Name
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -181,12 +181,12 @@ CP7Telemetry::CP7Telemetry(IP7_Client *i_pClient, const tXCHAR *i_pName)
     , m_pClient(i_pClient)
     , m_dwChannel_ID(0)
     , m_bInitialized(TRUE)
+    , m_dwUsed(0)
     , m_dwResets_Channel(RESET_UNDEFINED)
     , m_dwResets_Counters(RESET_UNDEFINED)
     , m_pChunks(NULL)
     , m_dwChunks_Max_Count(0)
     , m_bIs_Channel(FALSE)
-    , m_dwLast_ID(0)
     , m_pShared(NULL)
 {
      memset(&m_sCS, 0, sizeof(m_sCS));
@@ -356,7 +356,7 @@ void CP7Telemetry::On_Receive(tUINT32 i_dwChannel, tUINT8 *i_pBuffer, tUINT32 i_
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Create  
+// Create, i_pName is case sensitive and should be unique 
 tBOOL CP7Telemetry::Create(const tXCHAR  *i_pName, 
                            tINT64         i_llMin,
                            tINT64         i_llMax,
@@ -365,7 +365,8 @@ tBOOL CP7Telemetry::Create(const tXCHAR  *i_pName,
                            tUINT8        *o_pID 
                           )
 {
-    tBOOL l_bReturn = TRUE;
+    tWCHAR  l_pName[P7TELEMETRY_COUNTER_NAME_LENGTH];
+    tBOOL   l_bReturn = TRUE;
 
     if (    (FALSE == m_bInitialized)
          || (NULL == i_pName)
@@ -377,46 +378,55 @@ tBOOL CP7Telemetry::Create(const tXCHAR  *i_pName,
 
     LOCK_ENTER(m_sCS);
 
-    if (P7TELEMETRY_COUNTERS_MAX_COUNT <= m_dwLast_ID)
-    {
-        l_bReturn = FALSE;
-    }
+    ////////////////////////////////////////////////////////////////////////////
+    //find by name already existing counter
 
-    if (l_bReturn)
-    {
-        while (NULL != m_pCounters[m_dwLast_ID])
-        {
-            m_dwLast_ID ++;
+    l_pName[0] = 0;
+    PUStrCpy(l_pName, P7TRACE_NAME_LENGTH, i_pName);
 
-            if (P7TELEMETRY_COUNTERS_MAX_COUNT <= m_dwLast_ID)
-            {
-                l_bReturn = FALSE;
-                break;
-            }
-        }
-    }
-
-    if (l_bReturn)
+    for (tUINT32 l_dwI = 0; l_dwI < m_dwUsed; l_dwI++)
     {
-        m_pCounters[m_dwLast_ID] = new CP7Tel_Counter((tUINT8)m_dwLast_ID,
-                                                      i_bOn,
-                                                      i_llMin,
-                                                      i_llMax,
-                                                      i_llAlarm,
-                                                      i_pName
-                                                     );
-        if (    (NULL == m_pCounters[m_dwLast_ID])
-             || (FALSE == m_pCounters[m_dwLast_ID]->Is_Initialized())
-           )
+        if (m_pCounters[l_dwI]->Has_Name(l_pName))
         {
             l_bReturn = FALSE;
+            goto l_lblExit;
         }
     }
 
+
+    if (P7TELEMETRY_COUNTERS_MAX_COUNT <= m_dwUsed)
+    {
+        l_bReturn = FALSE;
+        goto l_lblExit;
+    }
+
+    m_pCounters[m_dwUsed] = new CP7Tel_Counter((tUINT8)m_dwUsed,
+                                               i_bOn,
+                                               i_llMin,
+                                               i_llMax,
+                                               i_llAlarm,
+                                               i_pName
+                                              );
+    if (    (NULL == m_pCounters[m_dwUsed])
+         || (FALSE == m_pCounters[m_dwUsed]->Is_Initialized())
+       )
+    {
+        if (m_pCounters[m_dwUsed])
+        {
+            delete m_pCounters[m_dwUsed];
+            m_pCounters[m_dwUsed] = NULL;
+        }
+
+        l_bReturn = FALSE;
+        goto l_lblExit;
+    }
+
+l_lblExit:
     if (l_bReturn)
     {
         m_dwResets_Counters = RESET_UNDEFINED;
-        *o_pID              = (tUINT8)m_dwLast_ID;
+        *o_pID              = (tUINT8)m_dwUsed;
+        m_dwUsed ++;
     }
 
     LOCK_EXIT(m_sCS);
@@ -426,12 +436,11 @@ tBOOL CP7Telemetry::Create(const tXCHAR  *i_pName,
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Find  
+// Find, i_pName is case sensitive
 tBOOL CP7Telemetry::Find(const tXCHAR *i_pName, tUINT8 *o_pID)
 {
-   tWCHAR           l_pName[P7TELEMETRY_COUNTER_NAME_LENGTH] = {0};
+   tWCHAR           l_pName[P7TELEMETRY_COUNTER_NAME_LENGTH];
    tBOOL            l_bReturn  = FALSE;
-   CP7Tel_Counter **l_pCounter = NULL;
 
     if (    (FALSE == m_bInitialized)
          || (NULL == i_pName)
@@ -445,14 +454,14 @@ tBOOL CP7Telemetry::Find(const tXCHAR *i_pName, tUINT8 *o_pID)
 
     LOCK_ENTER(m_sCS);
 
+    l_pName[0] = 0;
     PUStrCpy(l_pName, P7TRACE_NAME_LENGTH, i_pName);
-    l_pCounter = m_pCounters;
 
-    while (*l_pCounter)
+    for (tUINT32 l_dwI = 0; l_dwI < m_dwUsed; l_dwI++)
     {
-        if ((*l_pCounter)->Is_Name(l_pName))
+        if (m_pCounters[l_dwI]->Has_Name(l_pName))
         {
-            sP7Tel_Counter *l_pCnt = &((*l_pCounter)->m_sCounter);
+            sP7Tel_Counter *l_pCnt = &(m_pCounters[l_dwI]->m_sCounter);
 
             if (l_pCnt)
             {
@@ -462,8 +471,6 @@ tBOOL CP7Telemetry::Find(const tXCHAR *i_pName, tUINT8 *o_pID)
 
             break;
         }
-
-        l_pCounter ++;
     }
 
     LOCK_EXIT(m_sCS);
