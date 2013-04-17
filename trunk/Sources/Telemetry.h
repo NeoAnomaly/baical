@@ -40,7 +40,7 @@ public:
                    );
     ~CP7Tel_Counter();
 
-    tBOOL           Is_Name(const tWCHAR *i_pName);
+    tBOOL           Has_Name(const tWCHAR *i_pName);
     tBOOL           Is_Initialized();
     void            Enable(tUINT8 i_bOn);
 };
@@ -64,7 +64,8 @@ class CP7Telemetry:
     sP7Tel_Info             m_sHeader_Info;
     sP7Tel_Value            m_sValue;
 
-    CP7Tel_Counter         *m_pCounters[P7TELEMETRY_COUNTERS_MAX_COUNT];
+    CP7Tel_Counter         *m_pCounters[P7TELEMETRY_COUNTERS_MAX_COUNT + 1];
+    tUINT32                 m_dwUsed;
 
     tUINT32                 m_dwResets_Channel; 
     tUINT32                 m_dwResets_Counters; 
@@ -75,7 +76,6 @@ class CP7Telemetry:
 
     tBOOL                   m_bIs_Channel;
 
-    tUINT32                 m_dwLast_ID;
 
     hShared                *m_pShared;
 

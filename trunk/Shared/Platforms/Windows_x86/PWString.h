@@ -219,6 +219,41 @@ public:
         m_pBuffer[i_dwLenght] = 0;
     }
 
+    int Find(wchar_t *i_pSub, BOOL i_bCase_Sens = FALSE)
+    {
+        if (    (NULL == i_pSub)
+             || (NULL == m_pBuffer)
+           )
+        {
+            return -1;
+        }
+
+        size_t l_dwSub_Len = wcslen(i_pSub);
+        size_t l_dwStr_Len = wcslen(m_pBuffer);
+
+        if (FALSE == i_bCase_Sens)
+        {
+            for (size_t l_dwI = 0; l_dwI <= (l_dwStr_Len - l_dwSub_Len); l_dwI++)
+            {
+                if (0 == _wcsnicmp(m_pBuffer + l_dwI, i_pSub, l_dwSub_Len))
+                {
+                    return (int)l_dwI;
+                }
+            }
+        }
+        else
+        {
+            for (size_t l_dwI = 0; l_dwI <= (l_dwStr_Len - l_dwSub_Len); l_dwI++)
+            {
+                if (0 == wcsncmp(m_pBuffer + l_dwI, i_pSub, l_dwSub_Len))
+                {
+                    return (int)l_dwI;
+                }
+            }
+        }
+
+        return -1;
+    }
 
 private:
     void Remove()
