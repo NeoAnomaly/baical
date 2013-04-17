@@ -11,7 +11,7 @@ You may have to install in addition [http://www.microsoft.com/en-us/download/det
 [http://code.google.com/p/baical/source/checkout Checkout] latest source code:
 Changes list:
  * Fixed: update example 
- * Fixed: check telemetry counter name for uniqueness before adding new counter
+ * Fixed: check new telemetry counter name for uniqueness before creation
  * Fixed: GCC "new line" warning
  * Fixed: close channel properly if no counters were registered
 =Angara v0.9.8=
