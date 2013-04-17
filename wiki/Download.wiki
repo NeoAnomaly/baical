@@ -47,7 +47,7 @@ Changes list:
 
 -------------------
 =Old versions=
- * [http://baical.googlecode.com/files/Baical_v0.5.2.zip Baical v5.2]
+ * [http://baical.googlecode.com/files/Baical_v0.5.2.zip Baical v0.5.2]
  * [http://baical.googlecode.com/files/Baical_v0.5.zip Baical v0.5] 
  * [http://baical.googlecode.com/files/Baical_v0.4.zip Baical v0.4]
  * [http://baical.googlecode.com/files/Baical_v0.3.4.zip Baical v0.3.4]
