@@ -1,5 +1,5 @@
 #summary Download page
-=Baical v0.5.2=
+=Baical v0.6.5=
 [http://baical.googlecode.com/files/Baical_v0.6.5.zip Download] latest version.
 Changes list:
  * Added: P7.Trace viewer. Adding additional columns (file, function, line)
