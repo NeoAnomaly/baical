@@ -56,7 +56,7 @@ public:
                                ...
                               )                                             = 0;
 
-    virtual tUINT64        Get_Count()                                      = 0;
+    virtual tUINT64        Get_Count(eFJournal_Type i_eType)                = 0;
     virtual tINT32         Add_Ref()                                        = 0;
     virtual tINT32         Release()                                        = 0;
 };
