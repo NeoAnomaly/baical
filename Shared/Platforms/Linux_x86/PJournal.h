@@ -38,7 +38,7 @@ class CJournal
 {
     volatile tINT32    m_iRCnt;
     tLOCK              m_hCS;
-    tUINT64            m_qwCount;
+    tUINT64            m_pCount[EFJOIRNAL_TYPES_COUNT];
     eFJournal_Type     m_eVerbosity;
     tUINT32            m_pLength;
     tXCHAR            *m_pBuffer;
@@ -47,7 +47,6 @@ public:
     ////////////////////////////////////////////////////////////////////////////
     CJournal()
         : m_iRCnt(1)
-        , m_qwCount(0)
         , m_eVerbosity(EFJOIRNAL_TYPE_WARNING)
         , m_pLength(8192)
     {
@@ -56,6 +55,7 @@ public:
         for (tUINT32 l_dwI = 0; l_dwI < EFJOIRNAL_TYPES_COUNT; l_dwI++)
         {
             m_pName[l_dwI][0] = 0;
+            m_pCount[l_dwI]   = 0ULL;
         }
         
         strcpy(m_pName[EFJOIRNAL_TYPE_DEBUG],    "DEBUG  ");
@@ -146,6 +146,8 @@ public:
             goto l_lExit;
         }
 
+        m_pCount[i_eType] ++;
+
         l_iRes = snprintf(m_pBuffer + l_iOffs, 
                           m_pLength - l_iOffs,
                           "[%s] : [%d]\n", 
@@ -189,8 +191,7 @@ public:
         printf(m_pBuffer, 0); //0 to close warning from G++
         printf("\n");
         
-        m_qwCount ++;
-        
+       
     l_lExit:
         LOCK_EXIT(m_hCS);
         return l_bReturn;    
@@ -198,12 +199,19 @@ public:
 
     
     ////////////////////////////////////////////////////////////////////////////
-    tUINT64 Get_Count() 
+    tUINT64 Get_Count(eFJournal_Type i_eType) 
     {
-        tUINT64 l_qwReturn = 0;
+        tUINT64 l_qwReturn = 0ULL;
+
+        if (i_eType >= EFJOIRNAL_TYPES_COUNT)   
+        {
+            return 0ULL;
+        }
+
         LOCK_ENTER(m_hCS);
-        l_qwReturn =  m_qwCount;
+        l_qwReturn =  m_pCount[i_eType];
         LOCK_EXIT(m_hCS);
+
         return l_qwReturn;
     }
     

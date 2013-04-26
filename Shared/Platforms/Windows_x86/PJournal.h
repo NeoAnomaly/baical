@@ -58,7 +58,7 @@ private:
     BOOL               m_bFunction_Print;
     wchar_t            m_pTypes_Description[EFJOIRNAL_TYPES_COUNT][FJOURNAL_DESCRIPTION_MAX_LENGTH];
     CWString           m_cFile_Name;
-    UINT64             m_qwCount;
+    UINT64             m_pCount[EFJOIRNAL_TYPES_COUNT];
 
     eFJournal_Type     m_eVerbosity;
 
@@ -76,7 +76,6 @@ public:
        , m_hEvent_Exit(NULL)
        , m_hEvent_Write(NULL)
        , m_bFunction_Print(TRUE)
-       , m_qwCount(0)
        , m_lReference_Counter(1)
        , m_bInitialized(FALSE)
        , m_bError(FALSE)
@@ -84,6 +83,7 @@ public:
        , m_dwMax_Files(FJOURNAL_MAX_FILES)
     {
         memset(&m_tCS, 0, sizeof(CRITICAL_SECTION));
+        memset(&m_pCount, 0, sizeof(m_pCount));
 
         InitializeCriticalSection(&m_tCS);
 
@@ -256,14 +256,16 @@ public:
 
         EnterCriticalSection(&m_tCS);
 
+        m_pCount[i_eType]++;
+
         if (i_eType < m_eVerbosity)
         {
             l_bResult = FALSE;
             goto l_lExit;
         }
 
-        if ( (m_dwBuffer_Used >= FJOURNAL_FILE_BUFFER_LENGTH) || 
-             (FJOURNAL_FILE_BUFFER_MINIMUM_REMAINDER >= (FJOURNAL_FILE_BUFFER_LENGTH - m_dwBuffer_Used) )
+        if (    (m_dwBuffer_Used >= FJOURNAL_FILE_BUFFER_LENGTH) 
+             || (FJOURNAL_FILE_BUFFER_MINIMUM_REMAINDER >= (FJOURNAL_FILE_BUFFER_LENGTH - m_dwBuffer_Used) )
            )
         {
             SetEvent(m_hEvent_Write);
@@ -275,7 +277,9 @@ public:
         }
 
 
-        if ( (l_bResult) && (i_pFunction) )
+        if (    (l_bResult) 
+             && (i_pFunction) 
+           )
         {
             l_pBuffer = m_pJournal_Buffer + m_dwBuffer_Used;
 
@@ -356,7 +360,6 @@ public:
             (*l_pBuffer++) = 13;
             (*l_pBuffer++) = 10;
             m_dwBuffer_Used += 2;
-            m_qwCount ++;
         }
 
     l_lExit:
@@ -377,9 +380,20 @@ public:
         return m_cFile_Name.Get();
     }
 
-    tUINT64 Get_Count()
+    tUINT64 Get_Count(eFJournal_Type i_eType)
     {
-        return m_qwCount;
+        UINT64 l_qwReturn = 0ULL;
+        if (i_eType >= EFJOIRNAL_TYPES_COUNT) 
+        {
+            return 0ULL;
+        }
+
+        EnterCriticalSection(&m_tCS);
+        l_qwReturn = m_pCount[i_eType];
+        LeaveCriticalSection(&m_tCS);
+
+
+        return l_qwReturn;
     }
 
     tINT32 Add_Ref()
