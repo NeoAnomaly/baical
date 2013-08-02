@@ -63,36 +63,36 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(PROTOCOL7)\Binaries\</OutDir>
-    <IntDir>$(PROTOCOL7)\Binaries\Intermediate\Client\$(Configuration)_$(PlatformName)\</IntDir>
+    <OutDir>$(SolutionDir)\Binaries\</OutDir>
+    <IntDir>$(SolutionDir)\Binaries\Intermediate\Client\$(Configuration)_$(PlatformName)\</IntDir>
     <TargetName>$(ProjectName)_32_d</TargetName>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(PROTOCOL7)\Binaries\</OutDir>
-    <IntDir>$(PROTOCOL7)\Binaries\Intermediate\Client\$(Configuration)_$(PlatformName)\</IntDir>
+    <OutDir>$(SolutionDir)\Binaries\</OutDir>
+    <IntDir>$(SolutionDir)\Binaries\Intermediate\Client\$(Configuration)_$(PlatformName)\</IntDir>
     <TargetName>$(ProjectName)_64_d</TargetName>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
     <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(FrameworkSDKDir)\include</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(PROTOCOL7)\Binaries\</OutDir>
+    <OutDir>$(SolutionDir)\Binaries\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(PROTOCOL7)\Binaries\</OutDir>
+    <OutDir>$(SolutionDir)\Binaries\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IntDir>$(PROTOCOL7)\Binaries\Intermediate\Client\$(Configuration)_$(PlatformName)\</IntDir>
+    <IntDir>$(SolutionDir)\Binaries\Intermediate\Client\$(Configuration)_$(PlatformName)\</IntDir>
     <TargetName>$(ProjectName)_32</TargetName>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
     <IncludePath>$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IntDir>$(PROTOCOL7)\Binaries\Intermediate\Client\$(Configuration)_$(PlatformName)\</IntDir>
+    <IntDir>$(SolutionDir)\Binaries\Intermediate\Client\$(Configuration)_$(PlatformName)\</IntDir>
     <TargetName>$(ProjectName)_64</TargetName>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
     <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(FrameworkSDKDir)\include</IncludePath>
@@ -104,7 +104,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\..\SHARED;.\..\SHARED\Platforms\Windows_x86;$(PROTOCOL7)\Headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\..\SHARED;.\..\SHARED\Platforms\Windows_x86;$(SolutionDir)\Headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
@@ -125,7 +125,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_WIN64;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\..\SHARED;.\..\SHARED\Platforms\Windows_x86;$(PROTOCOL7)\Headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\..\SHARED;.\..\SHARED\Platforms\Windows_x86;$(SolutionDir)\Headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -147,7 +147,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\..\SHARED;.\..\SHARED\Platforms\Windows_x86;$(PROTOCOL7)\Headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\..\SHARED;.\..\SHARED\Platforms\Windows_x86;$(SolutionDir)\Headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
@@ -172,7 +172,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_WIN64;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\..\SHARED;.\..\SHARED\Platforms\Windows_x86;$(PROTOCOL7)\Headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\..\SHARED;.\..\SHARED\Platforms\Windows_x86;$(SolutionDir)\Headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>

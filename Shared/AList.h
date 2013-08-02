@@ -86,7 +86,9 @@ public:
         if (m_dwCount)
         {
 #ifdef _DEBUG
+    #if defined(_WIN32) || defined(_WIN64)
             OutputDebugStringW(L"Warning: List is not empty\n");
+    #endif
 #endif
         }
     }//CAList::~CAList
