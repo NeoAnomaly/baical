@@ -1,5 +1,5 @@
 //******************************************************************************
-// Copyright 2011 Zheltovskiy Andrey                                           *
+// Copyright 2013 Zheltovskiy Andrey                                           *
 //                                                                             *
 //   Licensed under the Apache License, Version 2.0 (the "License");           *
 //   you may not use this file except in compliance with the License.          *
@@ -20,8 +20,8 @@
 
 class CWString
 {
-    wchar_t *m_pBuffer;
-    DWORD    m_dwBuffer_Length;
+    tXCHAR *m_pBuffer;
+    tUINT32 m_dwBuffer_Length;
 public:
     CWString():
         m_pBuffer(NULL)
@@ -29,7 +29,7 @@ public:
     {
     }
 
-    CWString(wchar_t *i_pValue):
+    CWString(tXCHAR *i_pValue):
         m_pBuffer(NULL)
        ,m_dwBuffer_Length(0)
     {
@@ -41,21 +41,21 @@ public:
         Remove();
     }
 
-    BOOL Realloc(DWORD i_dwLength)
+    tBOOL Realloc(tUINT32 i_dwLength)
     {
-        BOOL l_bResult = TRUE;
+        tBOOL l_bResult = TRUE;
 
         if ( i_dwLength <= m_dwBuffer_Length )
         {
             return l_bResult;
         }
 
-        wchar_t *l_pBuffer = new wchar_t[i_dwLength];
+        tXCHAR *l_pBuffer = new tXCHAR[i_dwLength];
         if (l_pBuffer)
         {
             if (m_pBuffer)
             {
-                wcscpy_s(l_pBuffer, m_dwBuffer_Length, m_pBuffer);
+                PStrCpy(l_pBuffer, m_dwBuffer_Length, m_pBuffer);
                 Remove();
             }
             else
@@ -74,23 +74,23 @@ public:
         return l_bResult;
     }
 
-    BOOL Set(wchar_t *i_pValue)
+    tBOOL Set(const tXCHAR *i_pValue)
     {
-        BOOL l_bResult = TRUE;
+        tBOOL l_bResult = TRUE;
 
         if (NULL != i_pValue)
         {
-            DWORD l_dwInput_Value_Length = (DWORD)wcslen(i_pValue);
+            tUINT32 l_dwInput_Value_Length = (tUINT32)PStrLen(i_pValue);
             if ( l_dwInput_Value_Length >= m_dwBuffer_Length )
             {
                 Remove();
                 m_dwBuffer_Length = l_dwInput_Value_Length + 1;
-                m_pBuffer = new wchar_t[m_dwBuffer_Length];
+                m_pBuffer = new tXCHAR[m_dwBuffer_Length];
             }
 
             if (m_pBuffer)
             {
-                wcscpy_s(m_pBuffer, m_dwBuffer_Length, i_pValue);
+                PStrCpy(m_pBuffer, m_dwBuffer_Length, i_pValue);
             }
             else
             {
@@ -107,17 +107,17 @@ public:
     }
 
     // Example Append(3, L"Text1", L"Text2", L"Text3")
-    BOOL Append(DWORD i_dwCount, ...)
+    tBOOL Append(tUINT32 i_dwCount, ...)
     {
-        BOOL         l_bResult         = TRUE;
-        DWORD        l_dwAppend_Length = 0;
-        DWORD        l_dwString_Length = m_pBuffer ? (DWORD)wcslen(m_pBuffer) : 0;
+        tBOOL   l_bResult         = TRUE;
+        tUINT32 l_dwAppend_Length = 0;
+        tUINT32 l_dwString_Length = m_pBuffer ? (tUINT32)PStrLen(m_pBuffer) : 0;
 
 
         //Parameters verification
-        va_list      l_pVar_Args       = NULL;
-        wchar_t     *l_pItem           = NULL;
-        DWORD        l_dwIDX           = 0;
+        va_list  l_pVar_Args = NULL;
+        tXCHAR  *l_pItem     = NULL;
+        tUINT32  l_dwIDX     = 0;
 
         if (l_bResult)
         {
@@ -125,10 +125,10 @@ public:
 
             while (l_dwIDX < i_dwCount)
             {
-                l_pItem = va_arg(l_pVar_Args, wchar_t*);
+                l_pItem = va_arg(l_pVar_Args, tXCHAR*);
                 if (l_pItem)
                 {
-                    l_dwAppend_Length += (DWORD)wcslen(l_pItem);
+                    l_dwAppend_Length += (tUINT32)PStrLen(l_pItem);
                 }
 
                 l_dwIDX ++;
@@ -140,11 +140,11 @@ public:
         if ( (l_bResult) && ( (l_dwAppend_Length + l_dwString_Length) >= m_dwBuffer_Length ) )
         {
             m_dwBuffer_Length = l_dwAppend_Length + l_dwString_Length + 1;
-            wchar_t *l_pTMP_Buffer = new wchar_t[m_dwBuffer_Length];
+            tXCHAR *l_pTMP_Buffer = new tXCHAR[m_dwBuffer_Length];
 
             if ( (l_pTMP_Buffer) && (m_pBuffer) && (l_dwString_Length) )
             {
-                wcscpy_s(l_pTMP_Buffer, m_dwBuffer_Length, m_pBuffer);
+                PStrCpy(l_pTMP_Buffer, m_dwBuffer_Length, m_pBuffer);
             }
 
             if (m_pBuffer)
@@ -175,11 +175,11 @@ public:
 
             while (l_dwIDX < i_dwCount)
             {
-                l_pItem = va_arg(l_pVar_Args, wchar_t*);
+                l_pItem = va_arg(l_pVar_Args, tXCHAR*);
                 if (l_pItem)
                 {
-                    wcscpy_s(m_pBuffer + l_dwString_Length, m_dwBuffer_Length - l_dwString_Length, l_pItem);
-                    l_dwString_Length += (DWORD)wcslen(l_pItem);
+                    PStrCpy(m_pBuffer + l_dwString_Length, m_dwBuffer_Length - l_dwString_Length, l_pItem);
+                    l_dwString_Length += (tUINT32)PStrLen(l_pItem);
                 }
 
                 l_dwIDX ++;
@@ -191,25 +191,25 @@ public:
         return l_bResult;
     }
 
-    wchar_t * Get()
+    tXCHAR * Get()
     { 
         return m_pBuffer; 
     }
 
 
-    DWORD Length() 
+    tUINT32 Length()
     { 
-        return m_pBuffer ? (DWORD)wcslen(m_pBuffer) : 0; 
+        return m_pBuffer ? (tUINT32)PStrLen(m_pBuffer) : 0;
     }
 
-    DWORD Max_Length() 
+    tUINT32 Max_Length()
     { 
         return m_dwBuffer_Length; 
     }
 
-    void Trim(DWORD i_dwLenght)
+    void Trim(tUINT32 i_dwLenght)
     {
-        DWORD l_dwString_Length = m_pBuffer ? (DWORD)wcslen(m_pBuffer) : 0;
+        tUINT32 l_dwString_Length = m_pBuffer ? (tUINT32)PStrLen(m_pBuffer) : 0;
 
         if (i_dwLenght >= l_dwString_Length)
         {
@@ -219,7 +219,7 @@ public:
         m_pBuffer[i_dwLenght] = 0;
     }
 
-    int Find(wchar_t *i_pSub, BOOL i_bCase_Sens = FALSE)
+    tINT32 Find(tXCHAR *i_pSub, tBOOL i_bCase_Sens = FALSE)
     {
         if (    (NULL == i_pSub)
              || (NULL == m_pBuffer)
@@ -228,14 +228,14 @@ public:
             return -1;
         }
 
-        size_t l_dwSub_Len = wcslen(i_pSub);
-        size_t l_dwStr_Len = wcslen(m_pBuffer);
+        size_t l_dwSub_Len = PStrLen(i_pSub);
+        size_t l_dwStr_Len = PStrLen(m_pBuffer);
 
         if (FALSE == i_bCase_Sens)
         {
             for (size_t l_dwI = 0; l_dwI <= (l_dwStr_Len - l_dwSub_Len); l_dwI++)
             {
-                if (0 == _wcsnicmp(m_pBuffer + l_dwI, i_pSub, l_dwSub_Len))
+                if (0 == PStrNiCmp(m_pBuffer + l_dwI, i_pSub, l_dwSub_Len))
                 {
                     return (int)l_dwI;
                 }
@@ -245,7 +245,7 @@ public:
         {
             for (size_t l_dwI = 0; l_dwI <= (l_dwStr_Len - l_dwSub_Len); l_dwI++)
             {
-                if (0 == wcsncmp(m_pBuffer + l_dwI, i_pSub, l_dwSub_Len))
+                if (0 == PStrNCmp(m_pBuffer + l_dwI, i_pSub, l_dwSub_Len))
                 {
                     return (int)l_dwI;
                 }

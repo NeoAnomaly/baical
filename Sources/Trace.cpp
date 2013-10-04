@@ -845,6 +845,8 @@ void CP7Trace::On_Receive(tUINT32 i_dwChannel, tUINT8 *i_pBuffer, tUINT32 i_dwSi
 {
     LOCK_ENTER(m_sCS);
 
+    UNUSED_ARG(i_dwChannel);
+
     sP7Ext_Header *l_pHeader = (sP7Ext_Header *)i_pBuffer;
 
     if (    (l_pHeader)

@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright 2011 Zheltovskiy Andrey                                           /
+// Copyright 2013 Zheltovskiy Andrey                                           /
 //                                                                             /
 //   Licensed under the Apache License, Version 2.0 (the "License");           /
 //   you may not use this file except in compliance with the License.          /
@@ -18,7 +18,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <stddef.h>
-#include "PTypes.h"
+
 #include "GTypes.h"
 #include "GTypes.h"
 #include "GTypes.h"

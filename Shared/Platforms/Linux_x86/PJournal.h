@@ -86,6 +86,8 @@ public:
     ////////////////////////////////////////////////////////////////////////////
     tBOOL Initialize(const tXCHAR *i_pName)
     {
+        UNUSED_ARG(i_pName);
+
         if (m_pBuffer)
         {	
             return TRUE;

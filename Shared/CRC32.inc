@@ -21,7 +21,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <stddef.h>
-#include "PTypes.h"
+
 #include "GTypes.h"
 
 static tUINT32 g_pCRC32_Table[] = 
@@ -115,3 +115,4 @@ static tUINT32 g_pCRC32_Table[] =
 };      
 
 static tUINT32 *g_ppCRC32_Table = &g_pCRC32_Table[0];
+

@@ -22,7 +22,7 @@
 #include <limits.h>
 #include <math.h>
 
-#include "PTypes.h"
+
 #include "GTypes.h"
 
 #include "Length.h"
@@ -39,7 +39,8 @@
 #include "AList.h"
 
 #include "Ticks.h"
-#include "PWString.h"
+#include "PString.h"
+#include "WString.h"
 #include "PFileSystem.h"
 #include "PConsole.h"
 
@@ -581,6 +582,8 @@ int Test_03(int i_iArgC, char* i_pArgV[])
     IP7_Trace      *l_pTrace     = NULL;
     const tXCHAR   *l_pName      = TM("Formats test");
 
+    UNUSED_ARG(l_bExit);
+
     for (int l_iI = 0; l_iI < i_iArgC; l_iI++)
     {
         if (0 == STRNICMP(i_pArgV[l_iI], TEST_HELP, LENGTH(TEST_HELP)-1))
@@ -1090,7 +1093,7 @@ int Test_05(int i_iArgC, char* i_pArgV[])
 
                     if (FALSE == l_bError)
                     {
-                        SPRINTF(l_pCounter, TM("Counter"), 0);
+                        SPRINTF(l_pCounter, TM("Counter"));
 
                         tUINT8 l_bID = 0;
                         if (TRUE == l_pTelemetry->Find(l_pCounter, &l_bID))
@@ -1171,6 +1174,10 @@ int Test_06(int i_iArgC, char* i_pArgV[])
 
     tXCHAR         l_pCounter[128];
     tUINT8         l_pID[TEST_06_COUNTERS_COUNT];
+
+    UNUSED_ARG(l_bError);
+    UNUSED_ARG(l_pCounter);
+
 
     for (int l_iI = 0; l_iI < i_iArgC; l_iI++)
     {
@@ -1332,6 +1339,189 @@ l_lExit:
 
 
 
+
+////////////////////////////////////////////////////////////////////////////////
+//                                   TEST 7                                   //
+////////////////////////////////////////////////////////////////////////////////
+// Here we check shared memory                                                //
+////////////////////////////////////////////////////////////////////////////////
+
+#define SHARED_TRACE      TM("P7.Trace.Shared")
+#define SHARED_TELEMETRY  TM("P7.Trace.Telemetry")
+
+////////////////////////////////////////////////////////////////////////////////
+//Test_07
+int Test_07(int i_iArgC, char* i_pArgV[])
+{
+    IP7_Client    *l_pClient    = NULL;
+    IP7_Trace     *l_pTrace    = NULL;
+    IP7_Telemetry *l_pTelemetry = NULL;
+    tBOOL          l_bExit      = FALSE;
+    tUINT8         l_bID        = 0;
+    tUINT32        l_dwTime     = GetTickCount();
+    tUINT32        l_dwIter     = 0;
+    tBOOL          l_bError     = FALSE;
+
+
+
+    for (int l_iI = 0; l_iI < i_iArgC; l_iI++)
+    {
+        if (0 == STRNICMP(i_pArgV[l_iI], TEST_HELP, LENGTH(TEST_HELP)-1))
+        {
+            printf("This test ckeck wokring of shared memory and next functions:\n"
+                   " - IP7_Trace::Share(...)\n"
+                   " - P7_Get_Shared_Trace\n"
+                   " - IP7_Telemetry::Share(...)\n"
+                   " - P7_Get_Shared_Telemetry(...)"
+                  );
+
+            goto l_lExit;
+        }
+    }
+
+    l_pClient = P7_Create_Client(NULL);
+
+    if (NULL == l_pClient)
+    {
+        printf("Error: P7 engine was not initialized");
+        goto l_lExit;
+    }
+
+    printf("Entering to working cycle, press Esc to quit\n");
+
+    ////////////////////////////////////////////////////////////////////////////
+    while (FALSE == l_bExit)
+    {
+        l_pTelemetry = P7_Create_Telemetry(l_pClient, TM("Telemetry"));
+        if (NULL == l_pTelemetry)
+        {
+            printf("Error: P7 Telemetry was not initialized");
+            goto l_lExit;
+        }
+
+        l_pTrace = P7_Create_Trace(l_pClient, TM("Trace"));
+        if (NULL == l_pTelemetry)
+        {
+            printf("Error: P7 trace was not initialized");
+            goto l_lExit;
+        }
+
+        if (FALSE == l_pTelemetry->Create(TM("Counter"), 0, 1000, 950, 1, &l_bID))
+        {
+            printf("Error: Failed to create counter Exit\n");
+            goto l_lExit;
+        }
+
+        if (FALSE == l_pTelemetry->Share(SHARED_TELEMETRY))
+        {
+            printf("Error: Failed to share Telemetry instance, exit\n");
+            goto l_lExit;
+        }
+
+        if (FALSE == l_pTrace->Share(SHARED_TRACE))
+        {
+            printf("Error: Failed to share Trace instance, exit\n");
+            goto l_lExit;
+        }
+
+        for (tUINT32 l_dwI = 0; l_dwI < 10; l_dwI++)
+        {
+            IP7_Trace     *l_pSTtrace    = P7_Get_Shared_Trace(SHARED_TRACE);
+            IP7_Telemetry *l_pSTelemetry = P7_Get_Shared_Telemetry(SHARED_TELEMETRY);
+
+            if (    (l_pSTtrace)
+                 && (l_pSTelemetry)
+               )
+            {
+                for (tUINT32 l_dwJ = 0; l_dwJ < 1000; l_dwJ++)
+                {
+                    l_pSTtrace->P7_TRACE(0, TM("Test:%d"), l_dwJ);
+                    l_pSTelemetry->Add(l_bID, (tINT64)l_dwJ);
+                }
+            }
+            else
+            {
+                l_bError = TRUE;
+            }
+
+            if (l_pSTtrace)
+            {
+                l_pSTtrace->Release();
+                l_pSTtrace = NULL;
+            }
+
+            if (l_pSTelemetry)
+            {
+                l_pSTelemetry->Release();
+                l_pSTelemetry = NULL;
+            }
+
+            if (l_bError)
+            {
+                break;
+            }
+
+            CThShell::Sleep(1);
+        }//for (tUINT32 l_dwI = 0; l_dwI < 10; l_dwI++)
+
+
+        if (CTicks::Difference(GetTickCount(), l_dwTime) >= 1000)
+        {
+            l_dwTime     = GetTickCount();
+
+            if (    (Is_Key_Hit())
+                 && (27 == Get_Char())
+               )
+            {
+                printf("Esc ... exiting\n");
+                l_bExit = TRUE;
+            }
+
+        }
+
+        if (l_pTelemetry)
+        {
+            l_pTelemetry->Release();
+            l_pTelemetry = NULL;
+        }
+
+        if (l_pTrace)
+        {
+            l_pTrace->Release();
+            l_pTrace = NULL;
+        }
+
+        if (l_bError)
+        {
+            break;
+        }
+
+        printf("Iteration = %d\n", l_dwIter++);
+    }//while (FALSE == l_bExit)
+
+l_lExit:
+    if (l_pTelemetry)
+    {
+        l_pTelemetry->Release();
+        l_pTelemetry = NULL;
+    }
+
+    if (l_pTrace)
+    {
+        l_pTrace->Release();
+        l_pTrace = NULL;
+    }
+
+    if (l_pClient)
+    {
+        l_pClient->Release();
+        l_pClient = NULL;
+    }
+
+    return 0;
+}//Test_07
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //                                   MAIN                                     //
 ////////////////////////////////////////////////////////////////////////////////
@@ -1377,6 +1567,10 @@ int main(int i_iArgC, char* i_pArgV[])
     {
         l_iReturn = Test_06(i_iArgC, i_pArgV);
     }
+    else if (7 == l_iTest)
+    {
+        l_iReturn = Test_07(i_iArgC, i_pArgV);
+    }
     else
     {
         printf("ERROR: Test number is not specified or out of range\n");
@@ -1386,7 +1580,7 @@ int main(int i_iArgC, char* i_pArgV[])
         printf("           To get help about test: /Test=1 /?\n");
         printf("   /?    : show help for specific test.\n");
         printf("           Example: /Test=1 /?\n");
-        PRINTF(CLIENT_HELP_STRING, 0);
+        PRINTF(CLIENT_HELP_STRING);
     }
 
     

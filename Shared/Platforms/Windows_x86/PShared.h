@@ -41,14 +41,19 @@ static tBOOL Shared_Close(hShared *i_pShared)
 
     if (i_pShared->hMutex)
     {
-        CloseHandle(i_pShared->hMutex);
-        i_pShared->hMutex = NULL;
+        WaitForSingleObject(i_pShared->hMutex, 3000);
     }
 
     if (i_pShared->hMemory)
     {
         CloseHandle(i_pShared->hMemory);
         i_pShared->hMemory = NULL;
+    }
+
+    if (i_pShared->hMutex)
+    {
+        CloseHandle(i_pShared->hMutex);
+        i_pShared->hMutex = NULL;
     }
 
     delete i_pShared;
@@ -183,6 +188,7 @@ l_lblExit:
     if (FALSE == l_bResult)
     {
         Shared_Close(l_pReturn);
+        l_pReturn = NULL;
     }
 
     return l_pReturn;
