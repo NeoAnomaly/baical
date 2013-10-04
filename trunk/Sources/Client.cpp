@@ -426,7 +426,9 @@ eClient_Status CClient::Init_Sockets(tXCHAR **i_pArg, int i_iCount)
 
         tADDR_INFO *l_pInfo = NULL;
         tADDR_INFO *l_pNext = NULL;
-        tADDR_INFO  l_tHint = {0};
+        tADDR_INFO  l_tHint;
+
+        memset(&l_tHint, 0, sizeof(l_tHint));
 
         l_pAddr = Get_Argument_Text_Value(i_pArg, 
                                           i_iCount,
@@ -624,6 +626,9 @@ eClient_Status CClient::Init_Pool(tXCHAR **i_pArg, int i_iCount)
 eClient_Status CClient::Init_Members(tXCHAR **i_pArg, int i_iCount)
 {
     eClient_Status l_eReturn = ECLIENT_STATUS_OK;
+
+    UNUSED_ARG(i_pArg);
+    UNUSED_ARG(i_iCount);
 
     if (ECLIENT_STATUS_OK == l_eReturn)
     {
@@ -1275,9 +1280,11 @@ void CClient::Comm_Routine()
     tUINT32           l_dwWait_TimeOut     = COMMUNICATION_THREAD_IDLE_TIMEOUT;
     CTPacket         *l_pReceived_Packet   = NULL;
     CTPacket         *l_pSent_Packet       = NULL;
-    sockaddr_storage  l_tAddress           = {0};
     tUINT32           l_dwReceived         = 0;
     tBOOL             l_bConnected_Cur     = FALSE;
+    sockaddr_storage  l_tAddress;
+
+    memset(&l_tAddress, 0, sizeof(l_tAddress));
 
     while (FALSE == l_bExit)
     {

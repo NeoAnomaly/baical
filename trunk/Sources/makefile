@@ -23,18 +23,18 @@ $(BIN_DIR)/libP7.a:$(OBJ_DIR)/Trace.o $(OBJ_DIR)/CRC32.o $(OBJ_DIR)/Client.o $(O
 	ar -rv $(BIN_DIR)/libP7.a $(OBJ_DIR)/Trace.o $(OBJ_DIR)/CRC32.o $(OBJ_DIR)/Client.o $(OBJ_DIR)/Telemetry.o
 
 $(OBJ_DIR)/Trace.o:Trace.cpp $(OBJ_DIR)/CRC32.o $(OBJ_DIR)/Client.o
-	g++ -m32 -c -O2 -I$(H1_DIR) -I$(H2_DIR) -I$(H3_DIR) -MMD -MP -MF $(OBJ_DIR)/Trace.o.d -o $(OBJ_DIR)/Trace.o Trace.cpp
+	g++ -Wall -c -O2 -I$(H1_DIR) -I$(H2_DIR) -I$(H3_DIR) -MMD -MP -MF $(OBJ_DIR)/Trace.o.d -o $(OBJ_DIR)/Trace.o Trace.cpp
 
 $(OBJ_DIR)/Telemetry.o:Telemetry.cpp $(OBJ_DIR)/CRC32.o $(OBJ_DIR)/Client.o
-	g++ -m32 -c -O2 -I$(H1_DIR) -I$(H2_DIR) -I$(H3_DIR) -MMD -MP -MF $(OBJ_DIR)/Telemetry.o.d -o $(OBJ_DIR)/Telemetry.o Telemetry.cpp
+	g++ -Wall -c -O2 -I$(H1_DIR) -I$(H2_DIR) -I$(H3_DIR) -MMD -MP -MF $(OBJ_DIR)/Telemetry.o.d -o $(OBJ_DIR)/Telemetry.o Telemetry.cpp
 
 $(OBJ_DIR)/Client.o:Client.cpp $(OBJ_DIR)/CRC32.o
-	g++ -m32 -c -O2 -I$(H1_DIR) -I$(H2_DIR) -I$(H3_DIR) -MMD -MP -MF $(OBJ_DIR)/Client.o.d -o $(OBJ_DIR)/Client.o Client.cpp
+	g++ -Wall -c -O2 -I$(H1_DIR) -I$(H2_DIR) -I$(H3_DIR) -MMD -MP -MF $(OBJ_DIR)/Client.o.d -o $(OBJ_DIR)/Client.o Client.cpp
 
 $(OBJ_DIR)/CRC32.o:CRC32.cpp
 	rm -f -r $(OBJ_DIR)
 	mkdir -p $(OBJ_DIR)
-	g++ -m32 -c -O2 -I$(H1_DIR) -I$(H2_DIR) -MMD -MP -MF $(OBJ_DIR)/CRC32.o.d -o $(OBJ_DIR)/CRC32.o CRC32.cpp
+	g++ -Wall -c -O2 -I$(H1_DIR) -I$(H2_DIR) -MMD -MP -MF $(OBJ_DIR)/CRC32.o.d -o $(OBJ_DIR)/CRC32.o CRC32.cpp
 
 clean:
 	rm -f -r $(OBJ_DIR)

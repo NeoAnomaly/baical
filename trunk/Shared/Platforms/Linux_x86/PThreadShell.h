@@ -44,6 +44,7 @@ public:
                         const tXCHAR *i_pName
                        )
     {
+        UNUSED_ARG(i_pName);
         if (    ( NULL == i_pThread_Proc )
              || ( NULL == o_pThread )
            )
@@ -86,8 +87,10 @@ public:
     //Close
     static tBOOL Close(tTHREAD i_hThread, tUINT32 i_dwTimeOut)
     {
+        UNUSED_ARG(i_dwTimeOut);
+
         void *l_pRet = THSHELL_RET_OK;
-        
+
         tUINT32 l_iResult = pthread_join(i_hThread, &l_pRet);
         
         return (( 0 == l_iResult ) && (THSHELL_RET_OK == l_pRet)) ? TRUE : FALSE;

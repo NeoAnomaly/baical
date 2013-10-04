@@ -523,6 +523,62 @@ public:
 
 
     ////////////////////////////////////////////////////////////////////////////////
+    //Get_Process_Path
+    static tBOOL Get_Process_Path(tXCHAR *o_pPath, tINT32 i_iMax_Len)
+    {
+        int   l_iRead   = 0;
+        tBOOL l_bReturn = FALSE;
+
+        if (    (NULL == o_pPath)
+             || (32   >= i_iMax_Len)
+           )
+        {
+            goto l_lblExit;
+        }
+
+        l_iRead = readlink("/proc/self/exe", o_pPath, i_iMax_Len - 4);
+        if (0 >= l_iRead)
+        {
+            // I guess we're not running on the right version of unix
+            goto l_lblExit;
+        }
+
+        if (l_iRead >= i_iMax_Len)
+        {
+            // buffer is too small
+            goto l_lblExit;
+        }
+
+        o_pPath[l_iRead] = '\0';
+
+        while (l_iRead)
+        {
+            if (    ('/' == o_pPath[l_iRead])
+                 || ('\\' == o_pPath[l_iRead])
+               )
+            {
+                break;
+            }
+            else
+            {
+                o_pPath[l_iRead--] = 0;
+            }
+        }
+
+        l_bReturn = TRUE;
+
+    l_lblExit:
+
+        if (TRUE != l_bReturn)
+        {
+            strcpy(o_pPath, "./");
+        }
+
+        return l_bReturn;
+    }//Get_Process_Path
+
+
+    ////////////////////////////////////////////////////////////////////////////////
     //Get_Process_ID
     static tUINT32 Get_Process_ID()
     {

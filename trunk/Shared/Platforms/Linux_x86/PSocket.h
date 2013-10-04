@@ -154,6 +154,8 @@ static tBOOL Print_SAddr(sockaddr *i_pAddress, XCHAR *o_pIP, tUINT32 i_dwLen)
 //Disable_PortUnreachable_ICMP
 static tBOOL Disable_PortUnreachable_ICMP(tSOCKET i_hSocket)
 {
+    UNUSED_ARG(i_hSocket);
+
     //tUINT32  l_dwBytesReturned = 0;
     //tBOOL    l_bNewBehavior    = FALSE;
     //tUINT32  l_dwStatus        = 0;

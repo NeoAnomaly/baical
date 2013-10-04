@@ -29,7 +29,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include "PTypes.h"
+
 #include "GTypes.h"
 
 #include "Length.h"
@@ -47,7 +47,8 @@
 #include "AList.h"
 #include "PShared.h"
 
-#include "PWString.h"
+#include "PString.h"
+#include "WString.h"
 #include "PFileSystem.h"
 
 #include "PProcess.h"

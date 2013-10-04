@@ -38,7 +38,7 @@ tUINT32 Get_CRC32(tUINT8 *i_pData, tUINT32 i_dwCount)
         return l_dwResult;
     }
     
-#if defined(__i386__) && defined(__GNUC__) 
+#if defined(__i386__) && defined(__GNUC__) && !defined(GCC_FPIC)
     // Register use:
     //  eax - CRC32 value
     //  ebx - a lot of things

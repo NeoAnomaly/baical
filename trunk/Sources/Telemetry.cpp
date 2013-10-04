@@ -330,6 +330,8 @@ void CP7Telemetry::On_Receive(tUINT32 i_dwChannel, tUINT8 *i_pBuffer, tUINT32 i_
 
     sP7Ext_Header *l_pHeader = (sP7Ext_Header *)i_pBuffer;
 
+    UNUSED_ARG(i_dwChannel);
+
     if (    (l_pHeader)
          && (i_dwSize > sizeof(sP7Ext_Header))
        )

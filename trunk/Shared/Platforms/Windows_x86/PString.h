@@ -36,11 +36,34 @@ static tUINT32 PUStrLen(const tXCHAR *i_pText)
 }//PUStrLen
 
 
+////////////////////////////////////////////////////////////////////////////////
+//PStrCpy
+static tXCHAR* PStrCpy(tXCHAR       *i_pDst,
+                       size_t        i_szDst,
+                       const tXCHAR *i_pSrc
+                      )
+{
+    wcscpy_s((wchar_t*)i_pDst, i_szDst, (wchar_t*)i_pSrc);
+    return i_pDst;
+}//PStrLen
+
+
 ///////////////////////////////////////////////////////////////////////////////
 //PStrNCmp
-static tINT32 PStrNCmp(const tXCHAR *i_pS1, const tXCHAR *i_pS2, tUINT32 i_dwLen)
+static tINT32 PStrNCmp(const tXCHAR *i_pS1, const tXCHAR *i_pS2, size_t i_szLen)
 {
-    return _wcsnicmp(i_pS1, i_pS2, i_dwLen);
+    return _wcsnicmp(i_pS1, i_pS2, i_szLen);
+}//PStrNCmp
+
+
+////////////////////////////////////////////////////////////////////////////////
+//PStrNCmp
+static tINT32 PStrNiCmp(const tXCHAR *i_pS1,
+                        const tXCHAR *i_pS2,
+                        size_t        i_szLen
+                       )
+{
+    return _wcsnicmp(i_pS1, i_pS2, i_szLen);
 }//PStrNCmp
 
 

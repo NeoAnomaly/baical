@@ -22,7 +22,7 @@ $(BIN_DIR)/P7_Speed:$(OBJ_DIR)/Speed.o
 $(OBJ_DIR)/Speed.o:Speed.cpp
 	rm -f -r $(OBJ_DIR)
 	mkdir -p $(OBJ_DIR)
-	g++ -m32 -c -O2 -I$(H1_DIR) -I$(H2_DIR) -I$(H3_DIR) -MMD -MP -MF $(OBJ_DIR)/Speed.o.d -o $(OBJ_DIR)/Speed.o Speed.cpp
+	g++ -Wall -c -O2 -I$(H1_DIR) -I$(H2_DIR) -I$(H3_DIR) -MMD -MP -MF $(OBJ_DIR)/Speed.o.d -o $(OBJ_DIR)/Speed.o Speed.cpp
 
 clean:
 	rm -f -r $(OBJ_DIR)

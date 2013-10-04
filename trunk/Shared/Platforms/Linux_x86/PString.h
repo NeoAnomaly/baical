@@ -22,23 +22,47 @@
 
 #include "UTF.h"
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //PStrLen
 static __attribute__ ((unused)) tUINT32 PStrLen(const tXCHAR *i_pText) 
 {
     return strlen(i_pText);
 }//PStrLen
 
-
-///////////////////////////////////////////////////////////////////////////////
-//PStrNCmp
-static __attribute__ ((unused)) tINT32 PStrNCmp(const tXCHAR *i_pS1, const tXCHAR *i_pS2, tUINT32 i_dwLen)
+////////////////////////////////////////////////////////////////////////////////
+//PStrCpy
+static __attribute__ ((unused)) tXCHAR* PStrCpy(tXCHAR       *i_pDst,
+                                                size_t        i_szDst,
+                                                const tXCHAR *i_pSrc)
 {
-    return strncmp(i_pS1, i_pS2, i_dwLen);
+    UNUSED_ARG(i_szDst);
+    return strcpy(i_pDst, i_pSrc);
+}//PStrLen
+
+
+////////////////////////////////////////////////////////////////////////////////
+//PStrNCmp
+static __attribute__ ((unused)) tINT32 PStrNCmp(const tXCHAR *i_pS1,
+                                                const tXCHAR *i_pS2,
+                                                size_t        i_szLen
+                                               )
+{
+    return strncmp(i_pS1, i_pS2, i_szLen);
 }//PStrNCmp
 
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//PStrNCmp
+static __attribute__ ((unused)) tINT32 PStrNiCmp(const tXCHAR *i_pS1,
+                                                 const tXCHAR *i_pS2,
+                                                 size_t        i_szLen
+                                                )
+{
+    return strncasecmp(i_pS1, i_pS2, i_szLen);
+}//PStrNCmp
+
+
+////////////////////////////////////////////////////////////////////////////////
 //PStrToInt
 static __attribute__ ((unused)) tINT32 PStrToInt(const tXCHAR *i_pS1)
 {
@@ -46,7 +70,7 @@ static __attribute__ ((unused)) tINT32 PStrToInt(const tXCHAR *i_pS1)
 }//PStrToInt
 
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //PUStrLen
 static __attribute__ ((unused)) tUINT32 PUStrLen(const tXCHAR *i_pText)
 {
@@ -55,9 +79,11 @@ static __attribute__ ((unused)) tUINT32 PUStrLen(const tXCHAR *i_pText)
 
 
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //PStrCpy
-static __attribute__ ((unused)) void PUStrCpy(tWCHAR *i_pDst, tUINT32 i_dwMax_Len, const tXCHAR *i_pSrc)
+static __attribute__ ((unused)) void PUStrCpy(tWCHAR       *i_pDst,
+                                              tUINT32       i_dwMax_Len,
+                                              const tXCHAR *i_pSrc)
 {
     Convert_UTF8_To_UTF16(i_pSrc, i_pDst, i_dwMax_Len);
     //wcscpy_s(i_pDst, i_dwMax_Len, i_pSrc);

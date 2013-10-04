@@ -110,27 +110,27 @@ enum eClient_Status
     ECLIENT_STATUS_WRONG_PARAMETERS        ,
 };
 
-#pragma pack(push, 4) //alignment is now 4
+PRAGMA_PACK_ENTER(4) //alignment is now 4, MS Only//////////////////////////////
 
 struct sP7C_Status
 {
     tBOOL  bConnected;
     //count of the connection drops, when connection was reinitialized
     tUINT32 dwResets;
-};
+}ATTR_PACK(4);
 
 
 struct sP7C_Data_Chunk
 {
     void    *pData;
     tUINT32  dwSize;
-};
+}ATTR_PACK(4);
 
 
 struct sP7C_Channel_Info
 {
     tUINT32 dwID;
-};
+}ATTR_PACK(4);
 
 struct sP7C_Info
 {
@@ -140,10 +140,9 @@ struct sP7C_Info
     tUINT32            dwReject_Mem; //chunks rejected counter - no memory
     tUINT32            dwReject_Con; //chunks rejected counter - no connection
     tUINT32            dwReject_Int; //chunks rejected counter - internal errors
-};
+}ATTR_PACK(4);
 
-
-#pragma pack(pop)
+PRAGMA_PACK_EXIT()//4///////////////////////////////////////////////////////////
 
 
 class /*__declspec(novtable)*/ IP7C_Channel

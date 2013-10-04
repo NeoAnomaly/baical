@@ -22,7 +22,7 @@
 #include <stdarg.h>
 #include <limits.h>
 
-#include "PTypes.h"
+
 #include "GTypes.h"
 
 #include "PLock.h"
@@ -65,9 +65,9 @@ int main(int i_iArgC, char* i_pArgV[])
     printf("This test measures the time it is necessary for:\n");
     printf(" 1. print %d times simple string to buffer\n", ITERATIONS_COUNT);
     printf(" 2. print %d times simple string to console\n", ITERATIONS_COUNT);
-    printf("    this test combine test #1 and console printing\n", ITERATIONS_COUNT);
+    printf("    this test combine test #1 and console printing\n");
     printf(" 3. print & deliver %d times simple string to trace server\n", ITERATIONS_COUNT);
-    printf("    server will receive:\n", ITERATIONS_COUNT);
+    printf("    server will receive:\n");
     printf("       * Text message\n");
     printf("       * Level (error, warning, .. etc)\n");
     printf("       * Time with 100ns granularity\n");
