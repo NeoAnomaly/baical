@@ -1,0 +1,56 @@
+#summary Screenshots.
+
+==Screenshots==
+<table border="0" style=" margin-top:0px; margin-bottom:0px; margin-left:10px; margin-right:10px;" width="500px" cellspacing="0" cellpadding="2">
+     <tr>
+         <td width="250"> 
+            <H4>Angara</H4>
+            <a href='http://baical.googlecode.com/svn/wiki/Images/Angara.png' target='_blank'><img src='http://baical.googlecode.com/svn/wiki/Images/Angara.png' width='250' alt='' /></a>
+         </td>
+         <td width="250">
+            <H4>Baical main windows</H4>
+            <a href='http://baical.googlecode.com/svn/wiki/Images/Baical_Main.png' target='_blank'><img src='http://baical.googlecode.com/svn/wiki/Images/Baical_Main.png' width='250' alt='' /></a>
+         </td>
+     </tr>
+     <tr>
+         <td width="250"> 
+            <H4>P7.Trace Viewer</H4>
+            <a href='http://baical.googlecode.com/svn/wiki/Images/P7Viewer_Driver.png' target='_blank'><img src='http://baical.googlecode.com/svn/wiki/Images/P7Viewer_Driver.png' width='250' alt='' /></a>
+         </td>
+         <td width="250"> 
+            <H4>P7.Trace Viewer. Color scheme editing</H4>
+            <a href='http://baical.googlecode.com/svn/wiki/Images/P7Viewer_Colors.png' target='_blank'><img src='http://baical.googlecode.com/svn/wiki/Images/P7Viewer_Colors.png' width='250' alt='' /></a>
+         </td>
+     </tr>
+     <tr>
+         <td width="250"> 
+            <H4>P7.Trace Viewer. Find & Filter dialog</H4>
+            <a href='http://baical.googlecode.com/svn/wiki/Images/P7Viewer_Find.png' target='_blank'><img src='http://baical.googlecode.com/svn/wiki/Images/P7Viewer_Find.png' width='250' alt='' /></a>
+         </td>
+         <td width="250"> 
+            <H4>P7.Trace Viewer. Menu</H4>
+            <a href='http://baical.googlecode.com/svn/wiki/Images/P7Viewer_Menu.png' target='_blank'><img src='http://baical.googlecode.com/svn/wiki/Images/P7Viewer_Menu.png' width='250' alt='' /></a>
+         </td>
+     </tr>
+     <tr>
+         <td width="250"> 
+            <H4>P7.Trace Viewer. Time</H4>
+            <a href='http://baical.googlecode.com/svn/wiki/Images/P7Viewer_Time.png' target='_blank'><img src='http://baical.googlecode.com/svn/wiki/Images/P7Viewer_Time.png' width='250' alt='' /></a>
+         </td>
+         <td width="250"> 
+            <H4>P7.Telemetry Viewer</H4>
+            <a href='http://baical.googlecode.com/svn/wiki/Images/P7Telemetry.png' target='_blank'><img src='http://baical.googlecode.com/svn/wiki/Images/P7Telemetry.png' width='250' alt='' /></a>
+         </td>
+     </tr>
+     <tr>
+         <td width="250"> 
+            <H4>P7.Telemetry Viewer. Algo</H4>
+            <a href='http://baical.googlecode.com/svn/wiki/Images/P7Telemetry_Algo.png' target='_blank'><img src='http://baical.googlecode.com/svn/wiki/Images/P7Telemetry_Algo.png' width='250' alt='' /></a>
+         </td>
+         <td width="250"> 
+            <H4>P7.Telemetry Viewer.Menu</H4>
+            <a href='http://baical.googlecode.com/svn/wiki/Images/P7Telemetry_Menu.png' target='_blank'><img src='http://baical.googlecode.com/svn/wiki/Images/P7Telemetry_Menu.png' width='250' alt='' /></a>
+         </td>
+     </tr>
+</table>
+</td>
