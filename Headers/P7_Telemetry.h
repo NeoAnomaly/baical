@@ -125,7 +125,6 @@ extern IP7_Telemetry * __stdcall P7_Create_Telemetry(IP7_Client   *i_pClient,
 //N.B.: Call of this functions can be slow, do not call this functions often, 
 //      the best choice is to call it once per module (DLL, LIB, SO ..) and then
 //      redistribute pointer inside module by other way
-//      !!!!!! Function is not implemented for Linux and will always return NULL
 extern IP7_Telemetry  * __stdcall P7_Get_Shared_Telemetry(const tXCHAR *i_pName);
 
 

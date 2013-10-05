@@ -211,7 +211,6 @@ extern IP7_Client * __stdcall P7_Create_Client(tXCHAR *i_pArgs);
 //N.B.: Call of this functions can be slow, do not call this functions often, 
 //      the best choice is to call it once per module (DLL, LIB, SO ..) and then
 //      redistribute pointer inside module by other way
-//      !!!!!! Function is not implemented for Linux and will always return NULL
 extern IP7_Client  * __stdcall P7_Get_Shared(const tXCHAR *i_pName);
 
 
