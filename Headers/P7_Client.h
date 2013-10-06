@@ -200,7 +200,7 @@ public:
 //list of all possible arguments you can find in this header at the top
 //If you do not specify arguments - the function will try to analyze process 
 //arguments
-extern IP7_Client * __stdcall P7_Create_Client(tXCHAR *i_pArgs);
+extern IP7_Client * __stdcall P7_Create_Client(const tXCHAR *i_pArgs);
 
 
 ////////////////////////////////////////////////////////////////////////////////
