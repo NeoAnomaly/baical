@@ -1,15 +1,19 @@
 #summary Download page
-=P7 Library v1.7.5=
+=P7 Library v1.8=
 [http://code.google.com/p/baical/source/checkout Checkout] latest source code:
 Changes list:
- * Fixed: remove platform specific code from list class
- * Fixed: Fixed compilation issue for Win32/64 platform
+ * Added: Shared memory functionality for Linux
+ * Added: build script for Linux 
+ * Added: minor shared code improvement
+ * Fixed: GCC compilation warning
+ * Fixed: source code cleanup
+ * Fixed: minor bug fixes
 =Baical v0.6.6=
 [http://baical.googlecode.com/files/Baical_v0.6.6.zip Download] latest version.<br/>
 Changes list:
  * Added: Baical. VS 2010 redistributable libraries
  * Added: Baical. Status bar with start time & internal error counter
- * Baical. Specify default values in configuration file 
+ * Fixed: Baical. Specify default values in configuration file 
  * Fixed: P7.Telemetry viewer. Calculate points average value more precisely
  * Fixed: P7.Telemetry viewer. Show enhanced point information on click
  * Fixed: P7.Telemetry viewer. Rework cyclogram drawing algo
