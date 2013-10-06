@@ -97,21 +97,47 @@ class CClient:
 
     hShared             *m_pShared;
 public:
-    CClient(tXCHAR *i_pArgs);
+    CClient(const tXCHAR *i_pArgs);
     ~CClient();
 
 private:
-    tXCHAR        *Get_Argument_Text_Value(tXCHAR **i_pArg, 
-                                           tINT32   i_iCount,
-                                           tXCHAR *i_pName
+    tXCHAR        *Get_Argument_Text_Value(tXCHAR **i_pHC_Args,
+                                           tINT32   i_iHC_Count,
+                                           tXCHAR **i_pCn_Args,
+                                           tINT32   i_iCn_Count,
+                                           tXCHAR  *i_pName
                                           );
 
-    eClient_Status Init_Base(tXCHAR **i_pArg, tINT32 i_iCount);
-    eClient_Status Init_Log(tXCHAR **i_pArg, tINT32 i_iCount);
-    eClient_Status Init_Sockets(tXCHAR **i_pArg, tINT32 i_iCount);
-    eClient_Status Init_Pool(tXCHAR **i_pArg, tINT32 i_iCount);
-    eClient_Status Init_Members(tXCHAR **i_pArg, tINT32 i_iCount);
-    eClient_Status Init_Threads(tXCHAR **i_pArg, tINT32 i_iCount);
+    eClient_Status Init_Base(tXCHAR **i_pHC_Args,
+                             tINT32   i_iHC_Count,
+                             tXCHAR **i_pCn_Args,
+                             tINT32   i_iCn_Count
+                            );
+    eClient_Status Init_Log(tXCHAR **i_pHC_Args,
+                            tINT32   i_iHC_Count,
+                            tXCHAR **i_pCn_Args,
+                            tINT32   i_iCn_Count
+                           );
+    eClient_Status Init_Sockets(tXCHAR **i_pHC_Args,
+                                tINT32   i_iHC_Count,
+                                tXCHAR **i_pCn_Args,
+                                tINT32   i_iCn_Count
+                               );
+    eClient_Status Init_Pool(tXCHAR **i_pHC_Args,
+                             tINT32   i_iHC_Count,
+                             tXCHAR **i_pCn_Args,
+                             tINT32   i_iCn_Count
+                            );
+    eClient_Status Init_Members(tXCHAR **i_pHC_Args,
+                                tINT32   i_iHC_Count,
+                                tXCHAR **i_pCn_Args,
+                                tINT32   i_iCn_Count
+                               );
+    eClient_Status Init_Threads(tXCHAR **i_pHC_Args,
+                                tINT32   i_iHC_Count,
+                                tXCHAR **i_pCn_Args,
+                                tINT32   i_iCn_Count
+                               );
 
     void           Inc_Packet_ID(tUINT32 * o_pPacketID);
 

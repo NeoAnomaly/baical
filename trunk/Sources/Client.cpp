@@ -24,7 +24,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //P7_Create_Client
-IP7_Client * __stdcall P7_Create_Client(tXCHAR *i_pArgs)
+IP7_Client * __stdcall P7_Create_Client(const tXCHAR *i_pArgs)
 {
     CClient *l_pReturn = new CClient(i_pArgs);
 
@@ -70,7 +70,7 @@ IP7_Client * __stdcall P7_Get_Shared(const tXCHAR *i_pName)
 
 ////////////////////////////////////////////////////////////////////////////////
 //CClient
-CClient::CClient(tXCHAR *i_pArgs)
+CClient::CClient(const tXCHAR *i_pArgs)
     : m_lReference(1)
 
     , m_lReject_Mem(0)
@@ -120,54 +120,56 @@ CClient::CClient(tXCHAR *i_pArgs)
     memset(&m_hCS_Data_In,  0, sizeof(m_hCS_Data_In));
     memset(&m_hCS_Channels, 0, sizeof(m_hCS_Channels));
     
-
-
-    //1. Parse command line
-    int      l_iArgs_Count = 0;
-    tXCHAR **l_pArgs       = NULL;
+    //1. Parse command line from console and from source code,
+    //   priority belongs to console
+    int      l_iHC_ArgsC = 0;
+    tXCHAR **l_pHC_Args  = i_pArgs ? CProc::Get_ArgV(i_pArgs, &l_iHC_ArgsC) : NULL;
+    int      l_iCn_ArgsC = 0;
+    tXCHAR **l_pCn_Args  = CProc::Get_ArgV(&l_iCn_ArgsC);
             
-    if (i_pArgs)
-    {
-        l_pArgs = CProc::Get_ArgV(i_pArgs, &l_iArgs_Count);
-    }
-    else
-    {
-        l_pArgs = CProc::Get_ArgV(&l_iArgs_Count);
-    }
-        
 
-    //2. get OMN/OFF option
+    //2. get ON/OFF option
     if (ECLIENT_STATUS_OK == m_eStatus)
     {
-        m_eStatus = Init_Base(l_pArgs, l_iArgs_Count);
+        m_eStatus = Init_Base(l_pHC_Args, l_iHC_ArgsC, l_pCn_Args, l_iCn_ArgsC);
     }
 
     //3. initialize logging
     if (ECLIENT_STATUS_OK == m_eStatus)
     {
-        Init_Log(l_pArgs, l_iArgs_Count);
+        Init_Log(l_pHC_Args, l_iHC_ArgsC, l_pCn_Args, l_iCn_ArgsC);
     }
 
     //4. initialize network layer and sockets
     if (ECLIENT_STATUS_OK == m_eStatus)
     {
-        m_eStatus = Init_Sockets(l_pArgs, l_iArgs_Count);
+        m_eStatus = Init_Sockets(l_pHC_Args, l_iHC_ArgsC, l_pCn_Args, l_iCn_ArgsC);
     }
 
     //5. Initialize Pool
     if (ECLIENT_STATUS_OK == m_eStatus)
     {
-        m_eStatus = Init_Pool(l_pArgs, l_iArgs_Count);
+        m_eStatus = Init_Pool(l_pHC_Args, l_iHC_ArgsC, l_pCn_Args, l_iCn_ArgsC);
     }
    
     //6. Initialize variables
     if (ECLIENT_STATUS_OK == m_eStatus)
     {
-        m_eStatus = Init_Members(l_pArgs, l_iArgs_Count);
+        m_eStatus = Init_Members(l_pHC_Args, l_iHC_ArgsC, l_pCn_Args, l_iCn_ArgsC);
     }
    
     //7. cleanup
-    CProc::Free_ArgV(l_pArgs);
+    if (l_pHC_Args)
+    {
+        CProc::Free_ArgV(l_pHC_Args);
+        l_pHC_Args = NULL;
+    }
+
+    if (l_pCn_Args)
+    {
+        CProc::Free_ArgV(l_pCn_Args);
+        l_pCn_Args = NULL;
+    }
 }//CClient
 
 
@@ -297,17 +299,16 @@ CClient::~CClient()
 
 ////////////////////////////////////////////////////////////////////////////////
 //Get_Argument_Text_Value
-tXCHAR *CClient::Get_Argument_Text_Value(tXCHAR **i_pArg, 
-                                         int     i_iCount,
+tXCHAR *CClient::Get_Argument_Text_Value(tXCHAR **i_pHC_Args,
+                                         tINT32   i_iHC_Count,
+                                         tXCHAR **i_pCn_Args,
+                                         tINT32   i_iCn_Count,
                                          tXCHAR  *i_pName
                                         )
 {
     tXCHAR *l_pReturn = NULL;
 
-    if (    (NULL == i_pArg) 
-         || (NULL == i_pName)
-         || (1 >= i_iCount)
-       )
+    if (NULL == i_pName)
     {
         return l_pReturn;
     }
@@ -315,18 +316,45 @@ tXCHAR *CClient::Get_Argument_Text_Value(tXCHAR **i_pArg,
     tUINT32 l_dwName_Lenght = PStrLen(i_pName);
     tUINT32 i_dwArg_Lenght  = 0; 
 
-    for(tINT32 l_iIDX = 0; l_iIDX < i_iCount; l_iIDX++)
+    //Scan first console arguments, console has a proirity
+    if (    (NULL != i_pCn_Args) 
+         && (0 < i_iCn_Count) 
+       )
     {
-        i_dwArg_Lenght = PStrLen(i_pArg[l_iIDX]); 
-
-        if (    (l_dwName_Lenght <= i_dwArg_Lenght)
-             && (0 == PStrNCmp(i_pArg[l_iIDX], i_pName, l_dwName_Lenght))
-           )
+        for(tINT32 l_iIDX = 0; l_iIDX < i_iCn_Count; l_iIDX++)
         {
-            l_pReturn = i_pArg[l_iIDX] + l_dwName_Lenght;
-            break;
+            i_dwArg_Lenght = PStrLen(i_pCn_Args[l_iIDX]); 
+
+            if (    (l_dwName_Lenght <= i_dwArg_Lenght)
+                 && (0 == PStrNCmp(i_pCn_Args[l_iIDX], i_pName, l_dwName_Lenght))
+               )
+            {
+                l_pReturn = i_pCn_Args[l_iIDX] + l_dwName_Lenght;
+                break;
+            }
         }
     }
+
+    //if console arguments hasn't a value trying to find in hardcoded arguments
+    if (    (NULL != i_pHC_Args) 
+         && (0 < i_iHC_Count) 
+         && (NULL == l_pReturn)
+       )
+    {
+        for(tINT32 l_iIDX = 0; l_iIDX < i_iHC_Count; l_iIDX++)
+        {
+            i_dwArg_Lenght = PStrLen(i_pHC_Args[l_iIDX]); 
+
+            if (    (l_dwName_Lenght <= i_dwArg_Lenght)
+                 && (0 == PStrNCmp(i_pHC_Args[l_iIDX], i_pName, l_dwName_Lenght))
+               )
+            {
+                l_pReturn = i_pHC_Args[l_iIDX] + l_dwName_Lenght;
+                break;
+            }
+        }
+    }
+
 
     return l_pReturn;
 }//Get_Argument_Text_Value
@@ -334,11 +362,15 @@ tXCHAR *CClient::Get_Argument_Text_Value(tXCHAR **i_pArg,
 
 ////////////////////////////////////////////////////////////////////////////////
 //Init_Base
-eClient_Status CClient::Init_Base(tXCHAR **i_pArg, int i_iCount)
+eClient_Status CClient::Init_Base(tXCHAR **i_pHC_Args,
+                                  tINT32   i_iHC_Count,
+                                  tXCHAR **i_pCn_Args,
+                                  tINT32   i_iCn_Count
+                                 )
 {
     eClient_Status  l_eReturn    = ECLIENT_STATUS_OK;
-    tXCHAR         *l_pArg_Value = Get_Argument_Text_Value(i_pArg, 
-                                                           i_iCount,
+    tXCHAR         *l_pArg_Value = Get_Argument_Text_Value(i_pHC_Args, i_iHC_Count, 
+                                                           i_pCn_Args, i_iCn_Count,
                                                            (tXCHAR*)CLIENT_COMMAND_LOG_ON);
     if (    (NULL != l_pArg_Value)
          && (TM('0') == l_pArg_Value[0])
@@ -348,7 +380,13 @@ eClient_Status CClient::Init_Base(tXCHAR **i_pArg, int i_iCount)
         //JOURNAL_WARNING(m_pLog, L"Service is OFF by console command");
     }
 
-    if ( Get_Argument_Text_Value(i_pArg, i_iCount, (tXCHAR*)CLIENT_COMMAND_LOG_HELP) )
+    if ( Get_Argument_Text_Value(NULL,
+                                 0, 
+                                 i_pCn_Args, 
+                                 i_iCn_Count, 
+                                 (tXCHAR*)CLIENT_COMMAND_LOG_HELP
+                                ) 
+       )
     {
         PRINTF((tXCHAR*)CLIENT_HELP_STRING);
     }
@@ -359,13 +397,17 @@ eClient_Status CClient::Init_Base(tXCHAR **i_pArg, int i_iCount)
 
 ////////////////////////////////////////////////////////////////////////////////
 //Init_Log
-eClient_Status CClient::Init_Log(tXCHAR **i_pArg, int i_iCount)
+eClient_Status CClient::Init_Log(tXCHAR **i_pHC_Args,
+                                 tINT32   i_iHC_Count,
+                                 tXCHAR **i_pCn_Args,
+                                 tINT32   i_iCn_Count
+                                )
 {
     tXCHAR        *l_pArg_Value   = NULL;
     eFJournal_Type l_eVerbosity   = EFJOIRNAL_TYPE_CRITICAL;
 
-    l_pArg_Value = Get_Argument_Text_Value(i_pArg, 
-                                           i_iCount,
+    l_pArg_Value = Get_Argument_Text_Value(i_pHC_Args, i_iHC_Count, 
+                                           i_pCn_Args, i_iCn_Count,
                                            (tXCHAR*)CLIENT_COMMAND_LOG_VERBOSITY);
     if (NULL == l_pArg_Value)
     {
@@ -403,7 +445,11 @@ l_lClean_Up:
 
 ////////////////////////////////////////////////////////////////////////////////
 //Init_Sockets
-eClient_Status CClient::Init_Sockets(tXCHAR **i_pArg, int i_iCount)
+eClient_Status CClient::Init_Sockets(tXCHAR **i_pHC_Args,
+                                     tINT32   i_iHC_Count,
+                                     tXCHAR **i_pCn_Args,
+                                     tINT32   i_iCn_Count
+                                    )
 {
     eClient_Status l_eReturn = ECLIENT_STATUS_OK;
 
@@ -430,16 +476,16 @@ eClient_Status CClient::Init_Sockets(tXCHAR **i_pArg, int i_iCount)
 
         memset(&l_tHint, 0, sizeof(l_tHint));
 
-        l_pAddr = Get_Argument_Text_Value(i_pArg, 
-                                          i_iCount,
+        l_pAddr = Get_Argument_Text_Value(i_pHC_Args, i_iHC_Count, 
+                                          i_pCn_Args, i_iCn_Count,
                                           (tXCHAR*)CLIENT_COMMAND_LINE_ADDRESS);
         if (NULL == l_pAddr)
         {
             l_pAddr = (tXCHAR*)TM("127.0.0.1");
         }
 
-        l_pPort = Get_Argument_Text_Value(i_pArg, 
-                                          i_iCount,
+        l_pPort = Get_Argument_Text_Value(i_pHC_Args, i_iHC_Count, 
+                                          i_pCn_Args, i_iCn_Count,
                                           (tXCHAR*)CLIENT_COMMAND_LINE_PORT);
 
         if (NULL == l_pPort)
@@ -499,7 +545,11 @@ eClient_Status CClient::Init_Sockets(tXCHAR **i_pArg, int i_iCount)
 
 ////////////////////////////////////////////////////////////////////////////////
 //Init_Pool
-eClient_Status CClient::Init_Pool(tXCHAR **i_pArg, int i_iCount)
+eClient_Status CClient::Init_Pool(tXCHAR **i_pHC_Args,
+                                  tINT32   i_iHC_Count,
+                                  tXCHAR **i_pCn_Args,
+                                  tINT32   i_iCn_Count
+                                 )
 {
     //eClient_Status l_eReturn       = ECLIENT_STATUS_OK;
     tXCHAR        *l_pArg_Value    = NULL;
@@ -508,8 +558,8 @@ eClient_Status CClient::Init_Pool(tXCHAR **i_pArg, int i_iCount)
 
     ////////////////////////////////////////////////////////////////////////////
     //packet size
-    l_pArg_Value = Get_Argument_Text_Value(i_pArg, 
-                                           i_iCount,
+    l_pArg_Value = Get_Argument_Text_Value(i_pHC_Args, i_iHC_Count, 
+                                           i_pCn_Args, i_iCn_Count,
                                            (tXCHAR*)CLIENT_COMMAND_PACKET_SIZE);
     if (l_pArg_Value)
     {
@@ -527,8 +577,8 @@ eClient_Status CClient::Init_Pool(tXCHAR **i_pArg, int i_iCount)
 
     ////////////////////////////////////////////////////////////////////////////
     //pool size
-    l_pArg_Value = Get_Argument_Text_Value(i_pArg, 
-                                           i_iCount,
+    l_pArg_Value = Get_Argument_Text_Value(i_pHC_Args, i_iHC_Count, 
+                                           i_pCn_Args, i_iCn_Count,
                                            (tXCHAR*)CLIENT_COMMAND_POOL_SIZE);
     if (l_pArg_Value)
     {
@@ -571,8 +621,8 @@ eClient_Status CClient::Init_Pool(tXCHAR **i_pArg, int i_iCount)
     }
 
     
-    l_pArg_Value = Get_Argument_Text_Value(i_pArg, 
-                                           i_iCount,
+    l_pArg_Value = Get_Argument_Text_Value(i_pHC_Args, i_iHC_Count, 
+                                           i_pCn_Args, i_iCn_Count,
                                            (tXCHAR*)CLIENT_COMMAND_WINDOW_SIZE);
     if (l_pArg_Value)
     {
@@ -623,12 +673,18 @@ eClient_Status CClient::Init_Pool(tXCHAR **i_pArg, int i_iCount)
 
 ////////////////////////////////////////////////////////////////////////////////
 //Init_Members
-eClient_Status CClient::Init_Members(tXCHAR **i_pArg, int i_iCount)
+eClient_Status CClient::Init_Members(tXCHAR **i_pHC_Args,
+                                     tINT32   i_iHC_Count,
+                                     tXCHAR **i_pCn_Args,
+                                     tINT32   i_iCn_Count
+                                    )
 {
     eClient_Status l_eReturn = ECLIENT_STATUS_OK;
 
-    UNUSED_ARG(i_pArg);
-    UNUSED_ARG(i_iCount);
+    UNUSED_ARG(i_pHC_Args);
+    UNUSED_ARG(i_iHC_Count);
+    UNUSED_ARG(i_pCn_Args);
+    UNUSED_ARG(i_iCn_Count);
 
     if (ECLIENT_STATUS_OK == l_eReturn)
     {

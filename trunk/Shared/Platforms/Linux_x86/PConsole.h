@@ -22,7 +22,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //Is_Key_Hit
-static tBOOL Is_Key_Hit(void)
+static __attribute__ ((unused)) tBOOL Is_Key_Hit(void)
 {
 //  struct timeval tv;
 //  fd_set rdfs;
@@ -64,7 +64,7 @@ static tBOOL Is_Key_Hit(void)
 
 ////////////////////////////////////////////////////////////////////////////////
 //Get_Char
-static tXCHAR Get_Char()
+static __attribute__ ((unused)) tXCHAR Get_Char()
 {
     return getchar();
 }//Get_Char
