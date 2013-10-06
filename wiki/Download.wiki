@@ -5,6 +5,7 @@ Changes list:
  * Added: Shared memory functionality for Linux
  * Added: build script for Linux 
  * Added: minor shared code improvement
+ * Fixed: Use console P7_Client argument instead hard-coded if it specified in both sources
  * Fixed: GCC compilation warning
  * Fixed: source code cleanup
  * Fixed: minor bug fixes
