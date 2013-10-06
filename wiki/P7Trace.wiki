@@ -692,7 +692,7 @@ N.B.: Do not forget to setup your firewall (UDP, port: 9009), it can block traff
 Integration process is simple:
  # Build the [http://baical.googlecode.com/svn/trunk/ library]
  # Include into your project next headers
-    * _!GTypes.h_: {P7}\Headers\
+    * _GTypes.h_: {P7}\Headers\
     * _!P7_Client.h_: {P7}\Headers\
     * _!P7_Trace.h_: {P7}\Headers\
     * _!P7_Telemetry.h_: {P7}\Headers\
