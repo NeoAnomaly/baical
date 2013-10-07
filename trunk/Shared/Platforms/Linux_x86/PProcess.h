@@ -19,6 +19,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/syscall.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <asm/param.h> //HZ macro !
@@ -591,8 +592,9 @@ public:
     //Get_Thread_Id
     static tUINT32 Get_Thread_Id()
     {
-        return pthread_self();//gettid();
-        //return GetCurrentThreadId();
+        return (int32_t)syscall(SYS_gettid);
+        //return pthread_self();
+        //return gettid();
     }//Get_Thread_Id
     
     

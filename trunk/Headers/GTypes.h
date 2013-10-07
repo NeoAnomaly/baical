@@ -44,7 +44,19 @@
 
     #define __stdcall
 
+#if   defined(_M_X64)\
+   || defined(__amd64__)\
+   || defined(__amd64)\
+   || defined(_WIN64)\
+   || defined(__LP64__)\
+   || defined(_LP64)\
+   || defined(__x86_64__)\
+   || defined(__ppc64__)
+
+    #define __forceinline  
+#else
     #define __forceinline  __attribute__((always_inline))
+#endif
 
     #define PRAGMA_PACK_ENTER(x) 
     #define PRAGMA_PACK_EXIT(x) 

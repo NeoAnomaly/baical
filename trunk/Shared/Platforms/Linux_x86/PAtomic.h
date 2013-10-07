@@ -61,6 +61,8 @@
     //Another implementations:
     //http://upc.lbl.gov/web-translator/2.8.0/runtime/inst/opt/include/gasnet_atomic_bits.h
     //http://upc.lbl.gov/web-translator/ - in last versions very interesting
+    // For arm 6 & 7:
+    //http://lxr.free-electrons.com/source/arch/arm/include/asm/atomic.h 
 
     #define ATOMIC_ADD(ptr, val) \
          ({ volatile register tINT32 *__ptr asm("r2") = (ptr); \
@@ -95,11 +97,40 @@
                 : "r0","r3","ip","lr","cc","memory" ); \
             __result; })
 
-#else //#ifdef __ARM_ARCH_5TEJ__
-
-    #define ATOMIC_ADD(io_Val, i_Add) __sync_add_and_fetch(io_Val, i_Add)
-    #define ATOMIC_SUB(io_Val, i_Add) __sync_sub_and_fetch(io_Val, i_Add)
-
+//#ifdef __ARM_ARCH_5TEJ__
+#elif defined(__ARM_ARCH_7A__) || defined(__ARM_ARCH_7__) || defined(__ARM_ARCH_6__) 
+    #define ATOMIC_ADD(ptr, val) \
+        ({ int32_t tmp; \
+           int result; \
+           __asm__ __volatile__("@ atomic_add\n" \
+          "1:	ldrex	%0, [%3]\n" \
+          "	add	%0, %0, %4\n" \
+          "	strex	%1, %0, [%3]\n" \
+          "	teq	%1, #0\n" \
+          "	bne	1b" \
+            : "=&r" (result), "=&r" (tmp), "+Qo" (*ptr) \
+            : "r" (ptr), "Ir" (val) \
+            : "cc"); \
+        result;})
+    
+    #define ATOMIC_SUB(ptr, val) \
+        ({ unsigned long tmp; \
+           int result; \
+          __asm__ __volatile__("@ atomic_sub\n" \
+          "1:	ldrex	%0, [%3]\n" \
+          "	sub	%0, %0, %4\n" \
+          "	strex	%1, %0, [%3]\n" \
+          "	teq	%1, #0\n" \
+          "	bne	1b" \
+            : "=&r" (result), "=&r" (tmp), "+Qo" (*ptr) \
+            : "r" (ptr), "Ir" (val) \
+            : "cc"); \
+        result;})
+#else //#elif defined(__ARM_ARCH_7A__) || defined(__ARM_ARCH_7__) || defined(__ARM_ARCH_6__) 
+    
+        #define ATOMIC_ADD(io_Val, i_Add) __sync_add_and_fetch(io_Val, i_Add)
+        #define ATOMIC_SUB(io_Val, i_Add) __sync_sub_and_fetch(io_Val, i_Add)
+    
 #endif //#ifdef __ARM_ARCH_5TEJ__
 
 
