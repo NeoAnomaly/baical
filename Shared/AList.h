@@ -495,7 +495,7 @@ private:
         if (NULL == m_pIndex)
         {
             m_dwIndexCount = m_dwCount + 128;
-            m_pIndex = (pIndex_Cell*)MemAlloc(sizeof(pIndex_Cell) * m_dwIndexCount);
+            m_pIndex = (pIndex_Cell*)this->MemAlloc(sizeof(pIndex_Cell) * m_dwIndexCount);
         }
 
         if (NULL == m_pIndex)
@@ -531,7 +531,7 @@ private:
     {
         if (m_pIndex)
         {
-            MemFree(m_pIndex);
+            this->MemFree(m_pIndex);
             m_pIndex = NULL;
         }
 
@@ -581,7 +581,7 @@ protected:
     //CAList::Cell_Allocate
     virtual tCell *Cell_Allocate()
     {
-        return (tCell*)MemAlloc(sizeof(tCell));
+        return (tCell*)this->MemAlloc(sizeof(tCell));
     }//Cell_Allocate
 
     
@@ -589,7 +589,7 @@ protected:
     //CAList::Cell_Free
     virtual void Cell_Free(tCell *i_pCell)
     {
-        MemFree(i_pCell);
+        this->MemFree(i_pCell);
     }//Cell_Free
 };
 
@@ -663,7 +663,7 @@ private:
         {
             memset(l_pPool, 0, sizeof(tPool_Segment));
             l_pPool->m_dwCount = m_dwPool_Size;
-            l_pPool->m_pCells  = (TCELL*)MemAlloc(sizeof(TCELL) * l_pPool->m_dwCount);
+            l_pPool->m_pCells  = (TCELL*)this->MemAlloc(sizeof(TCELL) * l_pPool->m_dwCount);
             
             if (l_pPool->m_pCells)
             {
@@ -707,10 +707,10 @@ private:
         {
             if (io_pPool->m_pCells)
             {
-                MemFree(io_pPool->m_pCells);
+                this->MemFree(io_pPool->m_pCells);
                 io_pPool->m_pCells = NULL;
             }
-            MemFree(io_pPool);
+            this->MemFree(io_pPool);
         }
     }//CBList::Free_Pool_Segment
 

@@ -68,7 +68,7 @@ public:
 
     ////////////////////////////////////////////////////////////////////////////
     //~CMEvent
-    ~CMEvent()
+    virtual ~CMEvent()
     {
         if (m_bInit)
         {
@@ -92,7 +92,7 @@ public:
     //Init
     tBOOL Init(tUINT8 i_bCount, ...)
     {
-        va_list            l_pVA    = NULL;
+        va_list            l_pVA;
         tUINT8             l_bIDX   = 0;
         tBOOL              l_bCA    = FALSE;
         tBOOL              l_bSig   = FALSE;
