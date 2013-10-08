@@ -17,17 +17,6 @@
 #ifndef PFILE_H_AZH
 #define PFILE_H_AZH
 
-#define PFILE_INVALID_HANDLE                                                (-1)
-
-#ifndef _LARGEFILE64_SOURCE
-    #define _LARGEFILE64_SOURCE
-#endif
-//Headers have to be included in application source files
-//#include <sys/types.h>
-//#include <sys/stat.h>
-//#include <fcntl.h>
-//#include <unistd.h>
-//#include <errno.h>
 
 //UTF-8 text file header - {0xEF, 0xBB, 0xBF}
 
@@ -36,78 +25,76 @@ class CPFile
     : public IFile //virtual
 {
     volatile tINT32    m_iRCnt;
-    //tLOCK              m_hCS;
-    int                m_iFile;
+    HANDLE             m_hFile;
 public:
     ////////////////////////////////////////////////////////////////////////////
     CPFile()
         : m_iRCnt(1)
-        , m_iFile(-1)
+        , m_hFile(NULL)
     {
-        //LOCK_CREATE(m_hCS);
     }
 
     ////////////////////////////////////////////////////////////////////////////
     ~CPFile()
     {
-        //LOCK_DESTROY(m_hCS);
         Close(FALSE);
     }
 
     ////////////////////////////////////////////////////////////////////////////
     tBOOL Open(const tXCHAR *i_pName, tUINT32 i_dwFlags)
     {
-        int    l_iFlags = (ECREATE & i_dwFlags) ? O_CREAT : O_APPEND;
-        mode_t l_tMode  = 0;
+        DWORD l_dwDesiredAccess = GENERIC_READ;
 
-        if (PFILE_INVALID_HANDLE != m_iFile)
+        if (ESHARE_WRITE & i_dwFlags)
         {
-            Close(TRUE);
+            l_dwDesiredAccess |= GENERIC_WRITE;
         }
 
-        l_iFlags |= O_RDWR;
+        Close(TRUE);
 
-        if (ECREATE & i_dwFlags)
+        m_hFile = CreateFileW(i_pName, 
+                              l_dwDesiredAccess, 
+                              FILE_SHARE_READ, 
+                              NULL, 
+                              (i_dwFlags & EOPEN) ? OPEN_EXISTING : CREATE_ALWAYS,
+                              FILE_ATTRIBUTE_NORMAL,
+                              NULL
+                             );
+
+        if (    (NULL == m_hFile)
+             || (INVALID_HANDLE_VALUE == m_hFile)
+           )
         {
-            if (ESHARE_WRITE & i_dwFlags)
-            {
-                l_tMode = S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | S_IWGRP | S_IWOTH;
-            }
-            else if (ESHARE_READ & i_dwFlags)
-            {
-                l_tMode = S_IRUSR | S_IRGRP | S_IROTH;
-            }
+            m_hFile = NULL;
         }
 
-        m_iFile = open(i_pName, l_iFlags, l_tMode);
-
-        return (PFILE_INVALID_HANDLE != m_iFile) ? TRUE : FALSE;
+        return (NULL != m_hFile);
     }
 
     ////////////////////////////////////////////////////////////////////////////
     tBOOL Close(tBOOL i_bFlush)
     {
-        tBOOL l_bReturn = TRUE;
-        int   l_iTemp   = PFILE_INVALID_HANDLE;
+        tBOOL  l_bReturn = TRUE;
+        HANDLE l_hTemp   = NULL;
 
-        if (PFILE_INVALID_HANDLE == m_iFile)
+        if (NULL == m_hFile)
         {
             return TRUE;
         }
 
         if (i_bFlush)
         {
-            if (-1 == fsync(m_iFile))
+            if (FALSE == FlushFileBuffers(m_hFile))
             {
                 l_bReturn = FALSE;
                 goto l_lExit;
             }
         }
 
-        l_iTemp = m_iFile;
-        m_iFile = PFILE_INVALID_HANDLE;
+        l_hTemp = m_hFile;
+        m_hFile = NULL;
 
-        if (-1 == close(l_iTemp))
+        if (FALSE == CloseHandle(l_hTemp))
         {
             l_bReturn = FALSE;
             goto l_lExit;
@@ -120,13 +107,19 @@ public:
     ////////////////////////////////////////////////////////////////////////////
     tBOOL Set_Position(tUINT64 i_qwOffset)
     {
-        if (PFILE_INVALID_HANDLE == m_iFile)
+        if (NULL == m_hFile)
         {
             return FALSE;
         }
 
+        LONG l_lOffsetHi = (LONG)(i_qwOffset >> 32);
 
-        if ((off64_t)i_qwOffset != lseek64(m_iFile, (off64_t)i_qwOffset, SEEK_SET))
+        if (INVALID_SET_FILE_POINTER == SetFilePointer(m_hFile, 
+                                                       (LONG)i_qwOffset,  
+                                                       &l_lOffsetHi,
+                                                       FILE_BEGIN
+                                                      )
+           )
         {
             return FALSE;
         }
@@ -137,32 +130,55 @@ public:
     ////////////////////////////////////////////////////////////////////////////
     tUINT64 Get_Position()
     {
-        if (PFILE_INVALID_HANDLE == m_iFile)
+        if (INVALID_HANDLE_VALUE == m_hFile)
         {
             return 0ULL;
         }
 
-        return (off64_t)lseek64(m_iFile, 0LL, SEEK_CUR);
+        if (NULL == m_hFile)
+        {
+            return FALSE;
+        }
+
+        LONG  l_lOffsetHi   = 0;
+        DWORD l_dwOffsetLow = SetFilePointer(m_hFile, 
+                                             0,  
+                                             &l_lOffsetHi,
+                                             FILE_CURRENT
+                                            );
+
+        if (    (INVALID_SET_FILE_POINTER != l_dwOffsetLow)
+             || (NO_ERROR == GetLastError())
+           )
+        {
+            return (((tUINT64)l_lOffsetHi) << 32) + (tUINT64)l_dwOffsetLow;
+        }
+
+        return 0ULL;
     }
 
     ////////////////////////////////////////////////////////////////////////////
     tUINT64 Get_Size()
     {
-        if (PFILE_INVALID_HANDLE == m_iFile)
+        if (INVALID_HANDLE_VALUE == m_hFile)
         {
             return 0ULL;
         }
 
-        off64_t l_llPos = lseek64(m_iFile, 0LL, SEEK_CUR);
-        off64_t l_llSize = lseek64(m_iFile, 0LL, SEEK_END);
-        lseek64(m_iFile, l_llPos, SEEK_SET);
-        return l_llSize;
+        LARGE_INTEGER l_qwSize;
+
+        if (FALSE ==  GetFileSizeEx(m_hFile, &l_qwSize))
+        {
+            l_qwSize.QuadPart = 0LL;
+        }
+
+        return (tUINT64)l_qwSize.QuadPart;
     }
 
     ////////////////////////////////////////////////////////////////////////////
     size_t Write(const tUINT8 *i_pBuffer, size_t i_szBuffer, tBOOL i_bFlush)
     {
-        if (    (PFILE_INVALID_HANDLE == m_iFile)
+        if (    (INVALID_HANDLE_VALUE == m_hFile)
              || (NULL == i_pBuffer)
              || (0 == i_szBuffer)
            )
@@ -170,39 +186,42 @@ public:
             return 0ULL;
         }
 
-        ssize_t l_szRes     = 0;
-        size_t  l_szWritten = 0;
+        size_t  l_szReturn   = 0;
+        DWORD   l_dwWritten = 0;
         int     l_iError    = 0;
 
-        while (l_szWritten < i_szBuffer)
+        while (l_szReturn < i_szBuffer)
         {
-            l_szRes = write(m_iFile, i_pBuffer + l_szWritten, i_szBuffer - l_szWritten);
-            if (0 < l_szRes)
+            if (WriteFile(m_hFile, 
+                          i_pBuffer + l_szReturn, 
+                          i_szBuffer - l_szReturn, 
+                          &l_dwWritten, 
+                          NULL
+                         )
+               )
             {
-                l_szWritten += (size_t)l_szRes;
+                l_szReturn += (size_t)l_dwWritten;
             }
             else
             {
-                l_iError = errno;
-                printf("%d", l_iError);
                 break;
             }
         }
 
         if (    (i_bFlush)
-             && (l_szWritten)
+             && (l_szReturn)
            )
         {
-            fsync(m_iFile);
+            FlushFileBuffers(m_hFile);
         }
 
-        return l_szWritten;
+        return l_szReturn;
     }
 
     ////////////////////////////////////////////////////////////////////////////
     size_t Read(tUINT8 *o_pBuffer, size_t i_szBuffer)
     {
-        if (    (PFILE_INVALID_HANDLE == m_iFile)
+        if (    (INVALID_HANDLE_VALUE == m_hFile)
              || (NULL == o_pBuffer)
              || (0 == i_szBuffer)
            )
@@ -210,23 +229,33 @@ public:
             return 0ULL;
         }
 
-        size_t l_szRead = 0;
-        ssize_t l_szRes = 0;
+        size_t l_szReturn = 0;
+        DWORD  l_dwRead  = 0;
 
-        while (l_szRead < i_szBuffer)
+        while (l_szReturn < i_szBuffer)
         {
-            l_szRes = read(m_iFile, o_pBuffer + l_szRead, i_szBuffer - l_szRead);
-            if (0 < l_szRes)
+            if (ReadFile(m_hFile, 
+                         o_pBuffer + l_szReturn, 
+                         i_szBuffer - l_szReturn,
+                         &l_dwRead,
+                         NULL
+                        )
+               )
             {
-                l_szRead += (size_t)l_szRes;
+                l_szReturn += (size_t)l_dwRead;
             }
             else
             {
                 break;
             }
+
+            if (0 >= l_dwRead)
+            {
+                break;
+            }
         }
 
-        return l_szRead;
+        return l_szReturn;
     }
 
 
