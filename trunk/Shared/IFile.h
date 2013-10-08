@@ -32,19 +32,19 @@ public:
     };
 
 public:
-    virtual tBOOL          Open(const tXCHAR *i_pName, tUINT32 i_dwFlags)   = 0;
-    virtual tBOOL          Close(tBOOL i_bFlush)                            = 0;
-    virtual tBOOL          Set_Position(tUINT64 i_qwOffset)                 = 0;
-    virtual tUINT64        Get_Position()                                   = 0;
-    virtual tUINT64        Get_Size()                                       = 0;
-    virtual tUINT64        Write(const tUINT8 *i_pBuffer,
-                                 size_t        i_szBuffer,
-                                 tBOOL         i_bFlush
-                                )                                           = 0;
-    virtual tUINT64        Read(tUINT8 *o_pBuffer, size_t i_szBuffer)       = 0;
+    virtual tBOOL   Open(const tXCHAR *i_pName, tUINT32 i_dwFlags)          = 0;
+    virtual tBOOL   Close(tBOOL i_bFlush)                                   = 0;
+    virtual tBOOL   Set_Position(tUINT64 i_qwOffset)                        = 0;
+    virtual tUINT64 Get_Position()                                          = 0;
+    virtual tUINT64 Get_Size()                                              = 0;
+    virtual size_t  Write(const tUINT8 *i_pBuffer,                        
+                          size_t        i_szBuffer,                       
+                          tBOOL         i_bFlush                          
+                         )                                                  = 0;
+    virtual size_t  Read(tUINT8 *o_pBuffer, size_t i_szBuffer)              = 0;
 
-    virtual tINT32         Add_Ref()                                        = 0;
-    virtual tINT32         Release()                                        = 0;
+    virtual tINT32  Add_Ref()                                               = 0;
+    virtual tINT32  Release()                                               = 0;
 };
 
 
